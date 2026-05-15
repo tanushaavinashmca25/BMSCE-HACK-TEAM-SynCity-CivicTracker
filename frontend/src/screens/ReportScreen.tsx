@@ -8,7 +8,7 @@ import {
   CheckmarkCircle02Icon,
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react-native';
-import { Colors, Spacing, BorderRadius, FontSize, FontWeight, Shadow, Palette } from '../theme';
+import { Colors, Spacing, BorderRadius, FontSize, FontWeight, Shadow } from '../theme';
 import { supabase, REPORT_PHOTOS_BUCKET } from '../services/supabase';
 import { api, ApiError } from '../services/api';
 import { useAppConfig } from '../hooks/useConfig';
@@ -113,7 +113,7 @@ export default function ReportScreen({ route, navigation }: any) {
     if (!duplicate) return;
     try {
       await api.addReportComment(duplicate.id, 'Confirmed by another citizen.');
-    } catch {}
+    } catch { }
     setDuplicate(null);
     navigation.navigate('ReportDetail', { reportId: duplicate.id });
   };
@@ -124,7 +124,7 @@ export default function ReportScreen({ route, navigation }: any) {
         <View style={styles.header}>
           <Text style={styles.title}>Submit Report</Text>
           <TouchableOpacity style={styles.closeBtn} onPress={() => navigation.goBack()}>
-            <HugeiconsIcon icon={Cancel01Icon} color={Colors.primary} size={20} />
+            <HugeiconsIcon icon={Cancel01Icon} color={Colors.text} size={20} />
           </TouchableOpacity>
         </View>
 
@@ -149,10 +149,10 @@ export default function ReportScreen({ route, navigation }: any) {
                 <TouchableOpacity
                   key={c.code}
                   onPress={() => setCategory(c.code)}
-                  style={[styles.catChip, active && { borderColor: Palette.C1, backgroundColor: Palette.C3 }]}
+                  style={[styles.catChip, active && { borderColor: Colors.accent, backgroundColor: Colors.accentSoft }]}
                 >
-                  <HugeiconsIcon icon={iconFor(c.icon)} color={active ? Palette.C1 : Colors.textMuted} size={16} />
-                  <Text style={[styles.catChipText, active && { color: Palette.C1 }]}>{c.label}</Text>
+                  <HugeiconsIcon icon={iconFor(c.icon)} color={active ? Colors.accent : Colors.textMuted} size={16} />
+                  <Text style={[styles.catChipText, active && { color: Colors.accent }]}>{c.label}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -173,7 +173,7 @@ export default function ReportScreen({ route, navigation }: any) {
         </View>
 
         <View style={styles.infoRow}>
-          <HugeiconsIcon icon={MagicWand01Icon} color={Colors.primary} size={18} />
+          <HugeiconsIcon icon={MagicWand01Icon} color={Colors.accent} size={18} />
           <Text style={styles.infoText}>AI will verify your report within seconds of submission.</Text>
         </View>
 
@@ -196,11 +196,17 @@ export default function ReportScreen({ route, navigation }: any) {
         <View style={styles.modalOverlay}>
           <View style={styles.successCard}>
             <View style={styles.successIconWrap}>
-              <HugeiconsIcon icon={CheckmarkCircle02Icon} color={Palette.C2} size={56} />
+              <HugeiconsIcon icon={CheckmarkCircle02Icon} color={Colors.success} size={56} />
             </View>
             <Text style={styles.successTitle}>Action Recorded!</Text>
             <Text style={styles.successSub}>Thank you for contributing to a better community. Our AI is verifying your report.</Text>
-            <TouchableOpacity style={styles.successBtn} onPress={() => { setShowSuccess(false); navigation.navigate('Main'); }}>
+            <TouchableOpacity
+              style={styles.successBtn}
+              onPress={() => {
+                setShowSuccess(false);
+                navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+              }}
+            >
               <Text style={styles.successBtnText}>Return Home</Text>
             </TouchableOpacity>
           </View>
@@ -216,9 +222,9 @@ export default function ReportScreen({ route, navigation }: any) {
               <Text style={styles.dupTitle}>Nearby Report Found</Text>
             </View>
             <Text style={styles.dupSub}>A similar issue was reported {duplicate?.distance ? `${Math.round(duplicate.distance)}m` : 'nearby'} recently. Is this the same issue?</Text>
-            
+
             {duplicate?.image_url && <Image source={{ uri: duplicate.image_url }} style={styles.dupImg} />}
-            
+
             <TouchableOpacity style={styles.dupPrimaryBtn} onPress={confirmSameAsExisting}>
               <Text style={styles.dupPrimaryText}>It's the same — Confirm</Text>
             </TouchableOpacity>
@@ -241,45 +247,47 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   title: { fontSize: FontSize.xxl, fontWeight: FontWeight.heavy, color: Colors.text },
   closeBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: Colors.border },
-  imageCard: { width: '100%', height: 300, borderRadius: BorderRadius.xl, overflow: 'hidden', borderWidth: 2, borderColor: Colors.primary, ...Shadow.md },
+  imageCard: { width: '100%', height: 300, borderRadius: BorderRadius.xl, overflow: 'hidden', ...Shadow.md },
   image: { width: '100%', height: '100%' },
-  locBadge: { position: 'absolute', bottom: 12, left: 12, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: Colors.primary, paddingHorizontal: 12, paddingVertical: 6, borderRadius: BorderRadius.round },
+  locBadge: { position: 'absolute', bottom: 12, left: 12, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: BorderRadius.round },
   locText: { color: 'white', fontSize: 10, fontWeight: FontWeight.bold },
   section: { gap: Spacing.sm },
-  sectionLabel: { fontSize: FontSize.sm, fontWeight: FontWeight.heavy, color: Colors.primary, textTransform: 'uppercase', letterSpacing: 1 },
-  catGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  catChip: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 10, borderRadius: BorderRadius.lg, borderWidth: 1, borderColor: Palette.C3, backgroundColor: Colors.surface },
+  sectionLabel: { fontSize: FontSize.sm, fontWeight: FontWeight.heavy, color: Colors.text, textTransform: 'uppercase', letterSpacing: 1 },
+  catGrid: { flexDirection: 'row', gap: 12 },
+  catChip: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, borderRadius: BorderRadius.lg, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   catChipText: { fontSize: FontSize.sm, fontWeight: FontWeight.bold, color: Colors.textMuted },
-  input: { 
-    backgroundColor: Colors.surface, padding: Spacing.md, borderRadius: BorderRadius.lg, 
-    color: Colors.text, fontSize: FontSize.md, minHeight: 80, textAlignVertical: 'top', 
-    borderWidth: 1, borderColor: Palette.C3,
+  input: {
+    backgroundColor: Colors.surface, padding: Spacing.md, borderRadius: BorderRadius.lg,
+    color: Colors.text, fontSize: FontSize.md, minHeight: 80, textAlignVertical: 'top',
+    borderWidth: 1, borderColor: Colors.border,
+    // @ts-ignore
+    outlineStyle: 'none',
   },
-  infoRow: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: Colors.primarySoft, padding: Spacing.md, borderRadius: BorderRadius.lg },
-  infoText: { flex: 1, fontSize: 12, color: Colors.primary, fontWeight: FontWeight.bold, lineHeight: 18 },
+  infoRow: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: Colors.accentSoft, padding: Spacing.md, borderRadius: BorderRadius.lg },
+  infoText: { flex: 1, fontSize: 12, color: Colors.accent, fontWeight: FontWeight.bold, lineHeight: 18 },
   submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, backgroundColor: Colors.primary, height: 56, borderRadius: BorderRadius.xl, ...Shadow.lg },
   submitBtnText: { color: 'white', fontSize: FontSize.lg, fontWeight: FontWeight.heavy },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(15,23,42,0.8)', justifyContent: 'center', padding: Spacing.xl },
   successCard: { backgroundColor: 'white', borderRadius: BorderRadius.xxl, padding: Spacing.xl, alignItems: 'center', gap: Spacing.sm },
   successIconWrap: {
     width: 96, height: 96, borderRadius: 48,
-    backgroundColor: `${Palette.C2}15`,
+    backgroundColor: `${Colors.success}15`,
     alignItems: 'center', justifyContent: 'center',
     marginBottom: Spacing.sm,
   },
   successTitle: { fontSize: FontSize.xxl, fontWeight: FontWeight.heavy, color: Colors.text },
   successSub: { fontSize: FontSize.sm, color: Colors.textSecondary, textAlign: 'center', lineHeight: 22 },
-  successBtn: { backgroundColor: Colors.primary, paddingHorizontal: 32, paddingVertical: 14, borderRadius: BorderRadius.lg, marginTop: Spacing.md },
+  successBtn: { backgroundColor: Colors.accent, paddingHorizontal: 32, paddingVertical: 14, borderRadius: BorderRadius.lg, marginTop: Spacing.md },
   successBtnText: { color: 'white', fontWeight: FontWeight.heavy, fontSize: FontSize.md },
   dupCard: { backgroundColor: 'white', borderRadius: BorderRadius.xxl, padding: Spacing.lg, gap: Spacing.md },
   dupHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  dupTitle: { fontSize: FontSize.lg, fontWeight: FontWeight.heavy, color: Colors.primary },
+  dupTitle: { fontSize: FontSize.lg, fontWeight: FontWeight.heavy, color: Colors.text },
   dupSub: { fontSize: FontSize.sm, color: Colors.textSecondary, lineHeight: 20 },
-  dupImg: { width: '100%', height: 160, borderRadius: BorderRadius.lg, backgroundColor: Palette.C4 },
-  dupPrimaryBtn: { backgroundColor: Palette.C1, height: 52, borderRadius: BorderRadius.lg, alignItems: 'center', justifyContent: 'center' },
+  dupImg: { width: '100%', height: 160, borderRadius: BorderRadius.lg, backgroundColor: Colors.surfaceMuted },
+  dupPrimaryBtn: { backgroundColor: Colors.primary, height: 52, borderRadius: BorderRadius.lg, alignItems: 'center', justifyContent: 'center' },
   dupPrimaryText: { color: 'white', fontWeight: FontWeight.bold },
-  dupSecondaryBtn: { height: 52, borderRadius: BorderRadius.lg, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: Palette.C3 },
+  dupSecondaryBtn: { height: 52, borderRadius: BorderRadius.lg, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: Colors.border },
   dupSecondaryText: { color: Colors.text, fontWeight: FontWeight.bold },
   dupCancel: { alignItems: 'center', paddingVertical: 8 },
-  dupCancelText: { color: Colors.primary, fontSize: FontSize.sm, fontWeight: FontWeight.bold },
+  dupCancelText: { color: Colors.textMuted, fontSize: FontSize.sm, fontWeight: FontWeight.bold },
 });

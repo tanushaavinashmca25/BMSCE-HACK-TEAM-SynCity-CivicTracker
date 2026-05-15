@@ -8,7 +8,7 @@ import { HugeiconsIcon } from '@hugeicons/react-native';
 import {
   MapPinIcon, AlertCircleIcon, CheckmarkCircle02Icon, Shield01Icon,
 } from '@hugeicons/core-free-icons';
-import { Colors, Spacing, BorderRadius, FontSize, FontWeight, Shadow, Palette } from '../theme';
+import { Colors, Spacing, BorderRadius, FontSize, FontWeight, Shadow } from '../theme';
 import { api } from '../services/api';
 import type { Report, WardReports } from '../services/types';
 import { Card, EmptyState } from '../components/UI';
@@ -21,11 +21,11 @@ const RESOLVED_STATUSES = new Set(['Resolved']);
 type Tab = 'pending' | 'resolved';
 
 const statusColor = (s: string) => {
-  if (RESOLVED_STATUSES.has(s)) return Palette.C2;
-  if (s === 'Rejected') return '#ff0000';
-  if (s === 'In-Progress' || s === 'Assigned') return '#0048ff';
-  if (s === 'Pending Review') return '#ff8400';
-  return '#10b981';
+  if (RESOLVED_STATUSES.has(s)) return Colors.success;
+  if (s === 'Rejected') return Colors.danger;
+  if (s === 'In-Progress' || s === 'Assigned') return Colors.info;
+  if (s === 'Pending Review') return Colors.warning;
+  return Colors.primary;
 };
 
 export default function WardScreen({
@@ -105,7 +105,7 @@ export default function WardScreen({
   if (loading && !data) {
     return (
       <View style={[styles.container, styles.center]}>
-        <ActivityIndicator color={Palette.C1} />
+        <ActivityIndicator color={Colors.primary} />
       </View>
     );
   }
@@ -114,7 +114,7 @@ export default function WardScreen({
     <SafeAreaView style={styles.container}>
       <View style={styles.headerRow}>
         <View style={styles.headerIcon}>
-          <HugeiconsIcon icon={Shield01Icon} color={Palette.C1} size={24} />
+          <HugeiconsIcon icon={Shield01Icon} color={Colors.primary} size={24} />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.title}>Your ward</Text>
@@ -154,7 +154,7 @@ export default function WardScreen({
           active={tab === 'pending'}
           onPress={() => setTab('pending')}
           icon={AlertCircleIcon}
-          accent={Palette.C1}
+          accent={Colors.warning}
         />
         <TabBtn
           label="Resolved"
@@ -162,7 +162,7 @@ export default function WardScreen({
           active={tab === 'resolved'}
           onPress={() => setTab('resolved')}
           icon={CheckmarkCircle02Icon}
-          accent={Palette.C2}
+          accent={Colors.success}
         />
       </View>
 
@@ -176,7 +176,7 @@ export default function WardScreen({
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Palette.C1} />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
           }
           ListEmptyComponent={
             <Card>
@@ -377,17 +377,17 @@ const styles = StyleSheet.create({
   },
   headerIcon: {
     width: 48, height: 48, borderRadius: 14,
-    backgroundColor: Palette.C4,
+    backgroundColor: Colors.primarySoft,
     alignItems: 'center', justifyContent: 'center',
   },
-  title: { fontSize: FontSize.xxl, fontWeight: FontWeight.heavy, color: Colors.primary },
+  title: { fontSize: FontSize.xxl, fontWeight: FontWeight.heavy, color: Colors.text },
   subtitle: { fontSize: FontSize.sm, color: Colors.textSecondary, flexShrink: 1 },
   sliderRow: {
     paddingHorizontal: Spacing.lg, paddingTop: Spacing.xs, paddingBottom: 4,
   },
   sliderHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   sliderLabel: { fontSize: FontSize.xs, color: Colors.textSecondary, fontWeight: FontWeight.semibold },
-  sliderValue: { fontSize: FontSize.sm, color: Palette.C1, fontWeight: FontWeight.heavy },
+  sliderValue: { fontSize: FontSize.sm, color: Colors.primary, fontWeight: FontWeight.heavy },
   sliderTicks: { flexDirection: 'row', justifyContent: 'space-between', marginTop: -4 },
   sliderTickText: { fontSize: 10, color: Colors.textMuted },
   tabBar: {
