@@ -137,8 +137,15 @@ async def _verify_report_async(report_id: str, image_url: str, category: str, us
     except Exception as e:
         logger.exception("gemini failed for %s: %s", report_id, e)
 
-    verified = yolo.ok and yolo.category_detected
-    new_status = "Verified" if verified else ("Rejected" if yolo.ok else "Pending Review")
+    gemini_verified = gemini_result.get("ai_verification_status") == "Verified"
+    verified = (yolo.ok and yolo.category_detected) or gemini_verified
+
+    if verified:
+        new_status = "Verified"
+    elif gemini_result.get("ai_verification_status") == "Inauthentic":
+        new_status = "Rejected"
+    else:
+        new_status = "Rejected" if yolo.ok else "Pending Review"
 
     update = {
         "status": new_status,
