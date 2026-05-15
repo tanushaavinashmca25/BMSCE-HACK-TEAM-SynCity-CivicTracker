@@ -3,9 +3,10 @@ import {
   View, Text, StyleSheet, SafeAreaView, ScrollView, Image,
   TouchableOpacity, RefreshControl, ActivityIndicator, Alert,
 } from 'react-native';
+import type { Session } from '@supabase/supabase-js';
 import {
-  Logout01Icon, ChampionIcon, Fire03Icon, MapPinIcon, StarIcon,
-  LockedIcon, MagicWand01Icon, Settings01Icon,
+  Logout01Icon, ChampionIcon, MapPinIcon, StarIcon,
+  LockedIcon, UserCircleIcon,
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react-native';
 import { Colors, Spacing, BorderRadius, FontSize, FontWeight, Shadow } from '../theme';
@@ -13,7 +14,9 @@ import { supabase } from '../services/supabase';
 import { api } from '../services/api';
 import type { UserProfile, Badge as BadgeT, Report } from '../services/types';
 import { Avatar, Card, ProgressBar, StatPill, EmptyState, Badge, StreakFlame } from '../components/UI';
+import { CopyrightFooter } from '../components/CopyrightFooter';
 import { iconFor } from '../utils/icons';
+import { centeredScrollContent } from '../components/ScreenContent';
 
 type Tab = 'history' | 'badges';
 
@@ -21,6 +24,7 @@ const statusColor = (s: string) => {
   switch (s) {
     case 'Resolved':
     case 'Verified': return Colors.accent;
+    case 'Rejected': return Colors.danger;
     case 'In-Progress':
     case 'Assigned': return Colors.info;
     case 'Pending Review': return Colors.warning;
@@ -28,15 +32,30 @@ const statusColor = (s: string) => {
   }
 };
 
-export default function ProfileScreen({ navigation, active = true }: any = {}) {
+type Props = {
+  navigation?: any;
+  active?: boolean;
+  session: Session | null;
+  onSignIn: () => void;
+};
+
+export default function ProfileScreen({ navigation, active = true, session, onSignIn }: Props) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [reports, setReports] = useState<Report[]>([]);
   const [badges, setBadges] = useState<BadgeT[]>([]);
   const [tab, setTab] = useState<Tab>('history');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!!session);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
+    if (!session) {
+      setProfile(null);
+      setReports([]);
+      setBadges([]);
+      setLoading(false);
+      setRefreshing(false);
+      return;
+    }
     try {
       const [p, r, b] = await Promise.all([
         api.me(),
@@ -52,14 +71,36 @@ export default function ProfileScreen({ navigation, active = true }: any = {}) {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [session]);
 
   useEffect(() => { if (active) load(); }, [active, load]);
+
+  if (!session) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ScrollView contentContainerStyle={[styles.content, styles.guestContent]}>
+          <Card style={styles.guestCard}>
+            <View style={styles.guestIcon}>
+              <HugeiconsIcon icon={UserCircleIcon} color={Colors.primary} size={32} />
+            </View>
+            <Text style={styles.guestTitle}>Sign in for your profile</Text>
+            <Text style={styles.guestSub}>
+              Track XP, badges, and report history. Browsing the map and leaderboard works without an account.
+            </Text>
+            <TouchableOpacity style={styles.guestBtn} onPress={onSignIn}>
+              <Text style={styles.guestBtnText}>Sign in with email</Text>
+            </TouchableOpacity>
+          </Card>
+          <CopyrightFooter />
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
   if (loading && !profile) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator color={Colors.accent} />
+        <ActivityIndicator color={Colors.primary} />
       </View>
     );
   }
@@ -74,7 +115,7 @@ export default function ProfileScreen({ navigation, active = true }: any = {}) {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={Colors.accent} />}
       >
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Civic Profile</Text>
+          <Text style={styles.headerTitle}>SynCitizen</Text>
           <TouchableOpacity style={styles.settingsBtn} onPress={() => supabase.auth.signOut()}>
             <HugeiconsIcon icon={Logout01Icon} color={Colors.danger} size={20} />
           </TouchableOpacity>
@@ -178,7 +219,7 @@ export default function ProfileScreen({ navigation, active = true }: any = {}) {
           </View>
         )}
 
-        <View style={{ height: Spacing.xl }} />
+        <CopyrightFooter />
       </ScrollView>
     </SafeAreaView>
   );
@@ -186,9 +227,9 @@ export default function ProfileScreen({ navigation, active = true }: any = {}) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
-  content: { padding: Spacing.lg, gap: Spacing.lg },
+  content: { ...centeredScrollContent, gap: Spacing.lg, paddingBottom: Spacing.xxl },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  headerTitle: { fontSize: FontSize.xxl, fontWeight: FontWeight.heavy, color: Colors.text },
+  headerTitle: { fontSize: FontSize.xl, fontWeight: FontWeight.heavy, color: Colors.text, letterSpacing: -0.4 },
   settingsBtn: {
     width: 40, height: 40, borderRadius: 12,
     backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center',
@@ -205,13 +246,18 @@ const styles = StyleSheet.create({
   progressXp: { fontSize: FontSize.xs, fontWeight: FontWeight.bold, color: Colors.textSecondary },
   progressFooter: { fontSize: 10, color: Colors.textMuted, textAlign: 'center', fontWeight: FontWeight.medium },
   tabBar: {
-    flexDirection: 'row', backgroundColor: Colors.surfaceMuted,
-    padding: 4, borderRadius: BorderRadius.lg, gap: 4,
+    flexDirection: 'row',
+    backgroundColor: Colors.surfaceMuted,
+    padding: 4,
+    borderRadius: BorderRadius.lg,
+    gap: 4,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
-  tab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: BorderRadius.md },
+  tab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: BorderRadius.sm },
   tabActive: { backgroundColor: Colors.surface, ...Shadow.sm },
-  tabText: { fontSize: FontSize.sm, fontWeight: FontWeight.bold, color: Colors.textSecondary },
-  tabTextActive: { color: Colors.text },
+  tabText: { fontSize: FontSize.sm, fontWeight: FontWeight.medium, color: Colors.textMuted },
+  tabTextActive: { color: Colors.primary, fontWeight: FontWeight.semibold },
   reportList: { gap: Spacing.md },
   reportCard: { flexDirection: 'row', padding: Spacing.sm, gap: Spacing.md, alignItems: 'center' },
   reportImg: { width: 56, height: 56, borderRadius: 10, backgroundColor: Colors.surfaceMuted },
@@ -231,4 +277,22 @@ const styles = StyleSheet.create({
   badgeStatus: { fontSize: 8, fontWeight: FontWeight.heavy, color: Colors.accent, letterSpacing: 0.5 },
   badgeProgressWrap: { width: '100%', gap: 4 },
   badgeProgressText: { fontSize: 8, color: Colors.textMuted, textAlign: 'center', fontWeight: FontWeight.bold },
+  guestContent: { flexGrow: 1, justifyContent: 'center' },
+  guestCard: { alignItems: 'center', gap: Spacing.md, paddingVertical: Spacing.xl },
+  guestIcon: {
+    width: 72, height: 72, borderRadius: 22,
+    backgroundColor: Colors.primarySoft,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  guestTitle: { fontSize: FontSize.xl, fontWeight: FontWeight.bold, color: Colors.text, textAlign: 'center' },
+  guestSub: { fontSize: FontSize.sm, color: Colors.textSecondary, textAlign: 'center', lineHeight: 22 },
+  guestBtn: {
+    marginTop: Spacing.sm,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: 14,
+    borderRadius: BorderRadius.lg,
+    ...Shadow.md,
+  },
+  guestBtnText: { color: 'white', fontWeight: FontWeight.bold, fontSize: FontSize.md },
 });

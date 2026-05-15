@@ -9,6 +9,8 @@ import { Colors, Spacing, BorderRadius, FontSize, FontWeight, Shadow } from '../
 import { api } from '../services/api';
 import type { LeaderboardEntry } from '../services/types';
 import { Avatar, Card, EmptyState, Badge } from '../components/UI';
+import { CopyrightFooter } from '../components/CopyrightFooter';
+import { centeredScrollContent } from '../components/ScreenContent';
 
 const medalFor = (rank: number) => {
   if (rank === 1) return { color: '#F59E0B', label: '🥇' };
@@ -48,8 +50,8 @@ export default function LeaderboardScreen({ active = true }: { active?: boolean 
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={Colors.accent} />}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Civic Rankings</Text>
-          <Text style={styles.subtitle}>Top citizens driving change in our society</Text>
+          <Text style={styles.title}>Leaderboard</Text>
+          <Text style={styles.subtitle}>Top contributors ranked by verified impact</Text>
         </View>
 
         {loading && rows.length === 0 ? (
@@ -116,187 +118,117 @@ export default function LeaderboardScreen({ active = true }: { active?: boolean 
             </View>
           </>
         )}
-        <View style={{ height: Spacing.xl }} />
+        <CopyrightFooter />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F1F1F1',
-  },
-
-  content: {
-    padding: Spacing.lg,
-    gap: Spacing.lg,
-  },
-
-  header: {
-    gap: 6,
-    marginBottom: Spacing.sm,
-  },
-
+  container: { flex: 1, backgroundColor: Colors.background },
+  content: { ...centeredScrollContent, gap: Spacing.lg, paddingBottom: Spacing.xxl },
+  header: { gap: 6, marginBottom: Spacing.xs },
   title: {
-    fontSize: 36,
+    fontSize: FontSize.xxl,
     fontWeight: FontWeight.heavy,
-    color: '#1A2238',
-    letterSpacing: -1.2,
+    color: Colors.text,
+    letterSpacing: -0.6,
   },
-
   subtitle: {
-    fontSize: 15,
-    color: '#7A869A',
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
     fontWeight: FontWeight.medium,
     lineHeight: 22,
   },
-
   podium: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'center',
-    gap: Spacing.md,
-    marginTop: Spacing.lg,
-    paddingBottom: Spacing.lg,
+    gap: Spacing.sm,
+    marginTop: Spacing.md,
+    paddingBottom: Spacing.md,
   },
-
-  podiumCol: {
-    alignItems: 'center',
-    flex: 1,
-    gap: 6,
-  },
-
-  winnerCol: {
-    transform: [{ translateY: -18 }],
-  },
-
+  podiumCol: { alignItems: 'center', flex: 1, gap: 6 },
+  winnerCol: { transform: [{ translateY: -14 }] },
   podiumName: {
-    fontSize: 13,
-    fontWeight: FontWeight.heavy,
-    color: '#1A2238',
-    marginTop: 6,
-    letterSpacing: 0.2,
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.text,
+    marginTop: 4,
+    maxWidth: 100,
   },
-
   podiumXp: {
-    fontSize: 12,
-    color: '#FF6B00',
-    fontWeight: FontWeight.heavy,
-    letterSpacing: 0.3,
+    fontSize: FontSize.xs,
+    color: Colors.accent,
+    fontWeight: FontWeight.bold,
   },
-
   podiumBar: {
     width: '100%',
-    borderTopLeftRadius: 26,
-    borderTopRightRadius: 26,
+    borderTopLeftRadius: BorderRadius.lg,
+    borderTopRightRadius: BorderRadius.lg,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingTop: 16,
-    borderBottomWidth: 5,
-    borderBottomColor: '#FF6B00',
-
-    shadowColor: '#1F3A93',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.12,
-    shadowRadius: 18,
-    elevation: 8,
+    paddingTop: 14,
+    borderBottomWidth: 4,
+    borderBottomColor: Colors.accent,
+    ...Shadow.md,
   },
-
   podiumRank: {
     fontWeight: FontWeight.heavy,
-    fontSize: 34,
+    fontSize: 28,
     color: '#FFFFFF',
-    letterSpacing: -1,
+    letterSpacing: -0.5,
   },
-
-  list: {
-    gap: Spacing.md,
-  },
-
+  list: { gap: Spacing.sm },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
-
-    backgroundColor: '#FFFFFF',
-
+    backgroundColor: Colors.surface,
     padding: Spacing.md,
-
-    borderRadius: 24,
-
+    borderRadius: BorderRadius.lg,
     borderWidth: 1,
-    borderColor: 'rgba(31,58,147,0.05)',
-
-    shadowColor: '#1A2238',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-
-    elevation: 3,
+    borderColor: Colors.border,
+    ...Shadow.sm,
   },
-
   rank: {
-    width: 34,
+    width: 32,
     textAlign: 'center',
     fontWeight: FontWeight.heavy,
-    color: '#1F3A93',
-    fontSize: 18,
+    color: Colors.primary,
+    fontSize: FontSize.md,
   },
-
-  rowInfo: {
-    flex: 1,
-    gap: 3,
-  },
-
+  rowInfo: { flex: 1, gap: 2 },
   name: {
-    fontSize: 17,
-    fontWeight: FontWeight.heavy,
-    color: '#1A2238',
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    color: Colors.text,
     letterSpacing: -0.2,
   },
-
   level: {
-    fontSize: 12,
+    fontSize: FontSize.xs,
     fontWeight: FontWeight.medium,
-    color: '#7A869A',
-    textTransform: 'capitalize',
+    color: Colors.textMuted,
   },
-
-  rowStats: {
-    alignItems: 'flex-end',
-    gap: 6,
-  },
-
+  rowStats: { alignItems: 'flex-end', gap: 6 },
   xp: {
-    fontSize: 16,
-    fontWeight: FontWeight.heavy,
-    color: '#1F3A93',
-    letterSpacing: 0.2,
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    color: Colors.primary,
   },
-
-  metrics: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-
+  metrics: { flexDirection: 'row', gap: 8 },
   metric: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-
-    backgroundColor: '#F5F5F7',
-
+    backgroundColor: Colors.surfaceMuted,
     paddingHorizontal: 8,
     paddingVertical: 4,
-
-    borderRadius: 999,
+    borderRadius: BorderRadius.round,
   },
   metricVal: {
     fontSize: 10,
-    fontWeight: FontWeight.heavy,
-    color: '#7A869A',
+    fontWeight: FontWeight.semibold,
+    color: Colors.textSecondary,
   },
-
-
 });

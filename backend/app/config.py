@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str
     
     # App Settings
-    APP_NAME: str = "Civic Tracker AI"
+    APP_NAME: str = "SynCity"
     DEBUG: bool = True
     REPORT_PHOTOS_BUCKET: str = "report-photos"
     ADMIN_API_KEY: Optional[str] = None

@@ -12,11 +12,14 @@ import { Colors, Spacing, BorderRadius, FontSize, FontWeight, Shadow } from '../
 import { api, ApiError } from '../services/api';
 import type { Report, ReportUpdate } from '../services/types';
 import { Card, Badge, EmptyState, Avatar } from '../components/UI';
+import { CopyrightFooter } from '../components/CopyrightFooter';
+import { ScreenContent, SCREEN_MAX_WIDTH, centeredScrollContent } from '../components/ScreenContent';
 
 const statusColor = (s?: string | null) => {
   switch (s) {
     case 'Resolved':
     case 'Verified': return Colors.success;
+    case 'Rejected': return Colors.danger;
     case 'In-Progress':
     case 'Assigned': return Colors.info;
     case 'Pending Review': return Colors.warning;
@@ -91,6 +94,7 @@ export default function ReportDetailScreen({ route, navigation }: any) {
         style={{ flex: 1 }}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
+        <ScreenContent>
         <View style={styles.header}>
           <TouchableOpacity style={styles.closeBtn} onPress={() => navigation.goBack()}>
             <HugeiconsIcon icon={Cancel01Icon} color={Colors.text} size={20} />
@@ -177,28 +181,32 @@ export default function ReportDetailScreen({ route, navigation }: any) {
             )}
           </View>
 
+          <CopyrightFooter />
           <View style={{ height: 80 }} />
         </ScrollView>
 
-        <View style={styles.composer}>
-          <TextInput
-            style={styles.composerInput}
-            placeholder="Add a comment…"
-            placeholderTextColor={Colors.textMuted}
-            value={note}
-            onChangeText={setNote}
-            multiline
-            maxLength={500}
-            underlineColorAndroid="transparent"
-          />
-          <TouchableOpacity
-            style={[styles.sendBtn, (!note.trim() || sending) && { opacity: 0.5 }]}
-            onPress={sendNote}
-            disabled={!note.trim() || sending}
-          >
-            {sending ? <ActivityIndicator color="white" /> : <HugeiconsIcon icon={SentIcon} color="white" size={18} />}
-          </TouchableOpacity>
+        <View style={styles.composerWrap}>
+          <View style={styles.composer}>
+            <TextInput
+              style={styles.composerInput}
+              placeholder="Add a comment…"
+              placeholderTextColor={Colors.textMuted}
+              value={note}
+              onChangeText={setNote}
+              multiline
+              maxLength={500}
+              underlineColorAndroid="transparent"
+            />
+            <TouchableOpacity
+              style={[styles.sendBtn, (!note.trim() || sending) && { opacity: 0.5 }]}
+              onPress={sendNote}
+              disabled={!note.trim() || sending}
+            >
+              {sending ? <ActivityIndicator color="white" /> : <HugeiconsIcon icon={SentIcon} color="white" size={18} />}
+            </TouchableOpacity>
+          </View>
         </View>
+        </ScreenContent>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -219,8 +227,8 @@ const styles = StyleSheet.create({
   },
   headerTitle: { fontSize: FontSize.lg, fontWeight: FontWeight.heavy, color: Colors.text },
   headerSub: { fontSize: FontSize.xs, color: Colors.textSecondary },
-  content: { padding: Spacing.lg, gap: Spacing.md },
-  imageWrap: { width: '100%', height: 240, borderRadius: BorderRadius.xl, overflow: 'hidden', backgroundColor: Colors.surfaceMuted },
+  content: { ...centeredScrollContent, gap: Spacing.md, paddingBottom: Spacing.xxl },
+  imageWrap: { width: '100%', height: 240, borderRadius: BorderRadius.lg, overflow: 'hidden', backgroundColor: Colors.surfaceMuted, ...Shadow.sm },
   image: { width: '100%', height: '100%' },
   locationTag: {
     position: 'absolute', bottom: Spacing.sm, left: Spacing.sm,
@@ -246,12 +254,19 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.round,
   },
   statusPillText: { fontSize: FontSize.xs, fontWeight: FontWeight.bold },
-  composer: {
-    flexDirection: 'row', gap: Spacing.sm,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
+  composerWrap: {
+    alignItems: 'center',
     backgroundColor: Colors.surface,
-    borderTopWidth: 1, borderTopColor: Colors.border,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    paddingVertical: Spacing.sm,
+  },
+  composer: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    width: '100%',
+    maxWidth: SCREEN_MAX_WIDTH,
+    paddingHorizontal: Spacing.lg,
     alignItems: 'flex-end',
   },
   composerInput: {

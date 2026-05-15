@@ -12,6 +12,8 @@ import { Colors, Spacing, BorderRadius, FontSize, FontWeight, Shadow } from '../
 import { api } from '../services/api';
 import type { Report, WardReports } from '../services/types';
 import { Card, EmptyState } from '../components/UI';
+import { CopyrightFooter } from '../components/CopyrightFooter';
+import { ScreenContent } from '../components/ScreenContent';
 
 const PENDING_STATUSES = new Set([
   'Reported', 'Pending Review', 'Verified', 'Assigned', 'In-Progress',
@@ -112,6 +114,7 @@ export default function WardScreen({
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenContent>
       <View style={styles.headerRow}>
         <View style={styles.headerIcon}>
           <HugeiconsIcon icon={Shield01Icon} color={Colors.primary} size={24} />
@@ -194,8 +197,10 @@ export default function WardScreen({
           renderItem={({ item }) => (
             <ReportRow report={item} onPress={() => navigation?.navigate('ReportDetail', { reportId: item.id })} />
           )}
+          ListFooterComponent={<CopyrightFooter />}
         />
       )}
+      </ScreenContent>
     </SafeAreaView>
   );
 }
@@ -407,7 +412,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   countBadgeText: { fontSize: 11, fontWeight: FontWeight.heavy, color: Colors.textSecondary },
-  listContent: { padding: Spacing.lg, gap: Spacing.sm, paddingBottom: 120 },
+  listContent: { padding: Spacing.lg, gap: Spacing.sm, paddingBottom: 140 },
   row: { flexDirection: 'row', gap: Spacing.md, alignItems: 'center', padding: Spacing.sm + 2 },
   thumb: {
     width: 64, height: 64, borderRadius: BorderRadius.md,

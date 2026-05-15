@@ -24,7 +24,7 @@ async def get_app_config():
         ),
     ]
     return AppConfig(
-        app_name="Civic Tracker",
+        app_name="SynCity",
         tagline="Spot it. Snap it. Solve it.",
         categories=categories,
         levels=fetch_levels(),

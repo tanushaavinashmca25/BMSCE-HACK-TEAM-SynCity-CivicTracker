@@ -36,12 +36,13 @@ export function loadLeaflet(): Promise<void> {
 }
 
 export const STATUS_PIN: Record<string, string> = {
-  Reported: "#6366f1",
-  "Pending Review": "#f59e0b",
-  Assigned: "#0ea5e9",
-  "In-Progress": "#0ea5e9",
-  Resolved: "#10b981",
-  Verified: "#10b981",
+  Reported: "#0B2D6B",
+  "Pending Review": "#B45309",
+  Rejected: "#B91C1C",
+  Assigned: "#0369A1",
+  "In-Progress": "#0369A1",
+  Resolved: "#047857",
+  Verified: "#047857",
 };
 export const FALLBACK_PIN = "#64748b";
 

@@ -13,6 +13,8 @@ import { supabase, REPORT_PHOTOS_BUCKET } from '../services/supabase';
 import { api, ApiError } from '../services/api';
 import { useAppConfig } from '../hooks/useConfig';
 import { iconFor } from '../utils/icons';
+import { CopyrightFooter } from '../components/CopyrightFooter';
+import { centeredScrollContent, SCREEN_MAX_WIDTH } from '../components/ScreenContent';
 
 export default function ReportScreen({ route, navigation }: any) {
   const { config } = useAppConfig();
@@ -132,7 +134,7 @@ export default function ReportScreen({ route, navigation }: any) {
           <Image source={{ uri: photoUri }} style={styles.image} />
           {location && (
             <View style={styles.locBadge}>
-              <HugeiconsIcon icon={MapPinIcon} color={Colors.text} size={12} />
+              <HugeiconsIcon icon={MapPinIcon} color="white" size={12} />
               <Text style={styles.locText}>
                 {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
               </Text>
@@ -189,6 +191,8 @@ export default function ReportScreen({ route, navigation }: any) {
             </>
           )}
         </TouchableOpacity>
+
+        <CopyrightFooter />
       </ScrollView>
 
       {/* Success Modal */}
@@ -243,16 +247,16 @@ export default function ReportScreen({ route, navigation }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
-  content: { padding: Spacing.lg, gap: Spacing.lg },
+  content: { ...centeredScrollContent, gap: Spacing.lg, paddingBottom: Spacing.xxl },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title: { fontSize: FontSize.xxl, fontWeight: FontWeight.heavy, color: Colors.text },
-  closeBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: Colors.border },
-  imageCard: { width: '100%', height: 300, borderRadius: BorderRadius.xl, overflow: 'hidden', ...Shadow.md },
+  title: { fontSize: FontSize.xl, fontWeight: FontWeight.heavy, color: Colors.text, letterSpacing: -0.4 },
+  closeBtn: { width: 40, height: 40, borderRadius: BorderRadius.sm, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: Colors.border, ...Shadow.sm },
+  imageCard: { width: '100%', height: 280, borderRadius: BorderRadius.lg, overflow: 'hidden', ...Shadow.md },
   image: { width: '100%', height: '100%' },
   locBadge: { position: 'absolute', bottom: 12, left: 12, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: BorderRadius.round },
   locText: { color: 'white', fontSize: 10, fontWeight: FontWeight.bold },
   section: { gap: Spacing.sm },
-  sectionLabel: { fontSize: FontSize.sm, fontWeight: FontWeight.heavy, color: Colors.text, textTransform: 'uppercase', letterSpacing: 1 },
+  sectionLabel: { fontSize: FontSize.sm, fontWeight: FontWeight.semibold, color: Colors.text },
   catGrid: { flexDirection: 'row', gap: 12 },
   catChip: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, borderRadius: BorderRadius.lg, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   catChipText: { fontSize: FontSize.sm, fontWeight: FontWeight.bold, color: Colors.textMuted },
@@ -265,10 +269,24 @@ const styles = StyleSheet.create({
   },
   infoRow: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: Colors.accentSoft, padding: Spacing.md, borderRadius: BorderRadius.lg },
   infoText: { flex: 1, fontSize: 12, color: Colors.accent, fontWeight: FontWeight.bold, lineHeight: 18 },
-  submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, backgroundColor: Colors.primary, height: 56, borderRadius: BorderRadius.xl, ...Shadow.lg },
+  submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, backgroundColor: Colors.primary, height: 54, borderRadius: BorderRadius.lg, ...Shadow.md },
   submitBtnText: { color: 'white', fontSize: FontSize.lg, fontWeight: FontWeight.heavy },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(15,23,42,0.8)', justifyContent: 'center', padding: Spacing.xl },
-  successCard: { backgroundColor: 'white', borderRadius: BorderRadius.xxl, padding: Spacing.xl, alignItems: 'center', gap: Spacing.sm },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(15,23,42,0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.lg,
+  },
+  successCard: {
+    width: '100%',
+    maxWidth: SCREEN_MAX_WIDTH,
+    backgroundColor: 'white',
+    borderRadius: BorderRadius.xxl,
+    padding: Spacing.xl,
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
   successIconWrap: {
     width: 96, height: 96, borderRadius: 48,
     backgroundColor: `${Colors.success}15`,
@@ -279,7 +297,14 @@ const styles = StyleSheet.create({
   successSub: { fontSize: FontSize.sm, color: Colors.textSecondary, textAlign: 'center', lineHeight: 22 },
   successBtn: { backgroundColor: Colors.accent, paddingHorizontal: 32, paddingVertical: 14, borderRadius: BorderRadius.lg, marginTop: Spacing.md },
   successBtnText: { color: 'white', fontWeight: FontWeight.heavy, fontSize: FontSize.md },
-  dupCard: { backgroundColor: 'white', borderRadius: BorderRadius.xxl, padding: Spacing.lg, gap: Spacing.md },
+  dupCard: {
+    width: '100%',
+    maxWidth: SCREEN_MAX_WIDTH,
+    backgroundColor: 'white',
+    borderRadius: BorderRadius.xxl,
+    padding: Spacing.lg,
+    gap: Spacing.md,
+  },
   dupHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   dupTitle: { fontSize: FontSize.lg, fontWeight: FontWeight.heavy, color: Colors.text },
   dupSub: { fontSize: FontSize.sm, color: Colors.textSecondary, lineHeight: 20 },

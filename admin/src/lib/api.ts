@@ -98,11 +98,4 @@ export const adminApi = {
     }),
 };
 
-export const STATUSES = [
-  "Reported",
-  "Pending Review",
-  "Assigned",
-  "In-Progress",
-  "Resolved",
-  "Verified",
-] as const;
+export { REPORT_STATUSES as STATUSES } from "./statuses";

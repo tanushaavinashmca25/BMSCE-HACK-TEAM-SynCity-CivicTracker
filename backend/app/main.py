@@ -31,4 +31,4 @@ app.include_router(admin_api.router, prefix="/api/v1/admin", tags=["Admin"])
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to Civic Tracker AI API", "status": "healthy"}
+    return {"message": "Welcome to SynCity API", "status": "healthy"}

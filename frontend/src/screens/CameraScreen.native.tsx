@@ -5,6 +5,8 @@ import * as Location from 'expo-location';
 import { Cancel01Icon, Location01Icon, Camera01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react-native';
 import { Colors, Spacing, BorderRadius, FontSize, FontWeight, Shadow } from '../theme';
+import { supabase } from '../services/supabase';
+import { CopyrightFooter } from '../components/CopyrightFooter';
 
 export default function CameraScreen({ navigation }: any) {
   const device = useCameraDevice('back');
@@ -13,6 +15,12 @@ export default function CameraScreen({ navigation }: any) {
   const [coords, setCoords] = useState<{ lat: number; lng: number; acc: number | null } | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const cameraRef = useRef<Camera>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) navigation.replace('Auth');
+    });
+  }, [navigation]);
 
   useEffect(() => {
     (async () => {
@@ -132,6 +140,10 @@ export default function CameraScreen({ navigation }: any) {
           </TouchableOpacity>
         </View>
       </View>
+
+      <View style={styles.footer}>
+        <CopyrightFooter variant="dark" compact />
+      </View>
     </View>
   );
 }
@@ -187,4 +199,11 @@ const styles = StyleSheet.create({
   captureBtn: { width: 64, height: 64, borderRadius: 32, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' },
   captureBtnDisabled: { opacity: 0.5 },
   captureInner: { width: 56, height: 56, borderRadius: 28, borderWidth: 2, borderColor: Colors.primary },
+  footer: {
+    position: 'absolute',
+    bottom: 12,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+  },
 });

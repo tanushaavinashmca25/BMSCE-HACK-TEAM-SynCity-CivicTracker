@@ -22,10 +22,11 @@ type SortDir = "asc" | "desc";
 const STATUS_ORDER: Record<string, number> = {
   Reported: 0,
   "Pending Review": 1,
-  Assigned: 2,
-  "In-Progress": 3,
-  Resolved: 4,
-  Verified: 5,
+  Rejected: 2,
+  Assigned: 3,
+  "In-Progress": 4,
+  Resolved: 5,
+  Verified: 6,
 };
 
 function compare(a: Report, b: Report, key: SortKey): number {

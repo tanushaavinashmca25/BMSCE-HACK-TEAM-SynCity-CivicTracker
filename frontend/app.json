@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "SynCity",
+    "slug": "syncity",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -33,7 +33,9 @@
       "package": "com.anonymous.frontend"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "name": "SynCity",
+      "title": "SynCity"
     },
     "plugins": [
       [

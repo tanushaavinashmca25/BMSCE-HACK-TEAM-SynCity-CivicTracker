@@ -1,627 +1,214 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  SafeAreaView,
-  KeyboardAvoidingView,
-  Platform,
-  Dimensions,
+  View, Text, StyleSheet, TouchableOpacity, Alert,
+  SafeAreaView, KeyboardAvoidingView, Platform,
 } from 'react-native';
-
-import { supabase } from '../services/supabase';
-
 import {
-  Colors,
-  Shadow,
-} from '../theme';
-
-import {
-  Mail01Icon,
-  SecurityCheckIcon,
-} from '@hugeicons/core-free-icons';
-
+  sendEmailLoginCode,
+  verifyEmailOtp,
+  formatAuthError,
+  normalizeOtpInput,
+} from '../services/authHelpers';
+import { Colors, Spacing, BorderRadius, FontSize, FontWeight, Shadow, Fonts } from '../theme';
+import { Mail01Icon, SecurityCheckIcon, Cancel01Icon, MapPinIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react-native';
+import { APP_NAME } from '../constants/branding';
+import { CopyrightFooter } from '../components/CopyrightFooter';
+import { PrimaryButton, InputField } from '../components/Form';
+import { SCREEN_MAX_WIDTH } from '../components/ScreenContent';
 
 type Stage = 'email' | 'code';
 
-const { width } = Dimensions.get('window');
-
-export default function AuthScreen() {
-
+export default function AuthScreen({ navigation }: any) {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [stage, setStage] = useState<Stage>('email');
 
   const sendCode = async () => {
-
     const trimmed = email.trim().toLowerCase();
-
-    if (!trimmed) {
-      return Alert.alert(
-        'Credentials required',
-        'Enter your email to continue.'
-      );
-    }
-
+    if (!trimmed) return Alert.alert('Email required', 'Enter your email to continue.');
     setLoading(true);
-
-    const { error } = await supabase.auth.signInWithOtp({
-      email: trimmed,
-      options: {
-        shouldCreateUser: true,
-      },
-    });
-
+    const { error } = await sendEmailLoginCode(trimmed);
     setLoading(false);
-
-    if (error) {
-      return Alert.alert(
-        'Transmission failed',
-        error.message
-      );
-    }
-
+    if (error) return Alert.alert('Could not send code', formatAuthError(error));
+    setCode('');
     setStage('code');
   };
 
   const verifyCode = async () => {
-
-    const c = code.trim();
-
-    if (c.length < 6) {
-      return Alert.alert(
-        'Verification incomplete',
-        'Enter the 6-digit code.'
-      );
+    const digits = normalizeOtpInput(code);
+    if (digits.length < 6) {
+      return Alert.alert('Enter code', 'Enter the 6-digit code from your email (numbers only).');
     }
-
     setLoading(true);
-
-    const { error } = await supabase.auth.verifyOtp({
-      email: email.trim().toLowerCase(),
-      token: c,
-      type: 'email',
-    });
-
+    const { error } = await verifyEmailOtp(email, code);
     setLoading(false);
-
     if (error) {
-      Alert.alert('Access denied', error.message);
+      Alert.alert('Could not sign in', formatAuthError(error));
+      return;
     }
+    navigation.goBack();
   };
 
   return (
-
     <SafeAreaView style={styles.container}>
-
-      <View style={styles.topCircle} />
-      <View style={styles.bottomCircle} />
-
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.content}
+        style={styles.flex}
       >
+        <TouchableOpacity style={styles.close} onPress={() => navigation.goBack()} activeOpacity={0.85}>
+          <HugeiconsIcon icon={Cancel01Icon} color={Colors.text} size={22} />
+        </TouchableOpacity>
 
-        {/* HERO */}
-        <View style={styles.heroSection}>
-
-          <View style={styles.logoContainer}>
-
-            <View style={styles.logoOuterGlow} />
-
-            <View style={styles.logoCircle}>
-
-              <View style={styles.logoInnerCircle}>
-
-                <Text style={styles.logoS}>
-                  S
-                </Text>
-
-              </View>
-
+        <View style={styles.content}>
+          <View style={styles.hero}>
+            <View style={styles.heroMark}>
+              <HugeiconsIcon icon={MapPinIcon} color="white" size={32} />
             </View>
-
-            <Text style={styles.logoText}>
-              SynCity
-            </Text>
-
-            <Text style={styles.logoTagline}>
-              Smart Civic Platform
-            </Text>
-
+            <Text style={styles.brand}>{APP_NAME}</Text>
+            <Text style={styles.brandTag}>Civic reporting · Hackathon 2026</Text>
           </View>
-
-          <Text style={styles.smallHeading}>
-            COMMUNITY FIRST
-          </Text>
 
           <Text style={styles.title}>
-            {stage === 'email'
-              ? 'Join The Mission'
-              : 'Verify Access'}
+            {stage === 'email' ? 'Sign in to report' : 'Check your email'}
           </Text>
-
           <Text style={styles.subtitle}>
             {stage === 'email'
-              ? 'Report civic issues, improve your city, and collaborate with your local community effortlessly.'
-              : `Enter the secure code sent to ${email.trim().toLowerCase()}`}
+              ? 'You need an account to submit pothole reports. Browsing the map is free without login.'
+              : `We sent a code to ${email.trim().toLowerCase()}`}
           </Text>
 
-        </View>
-
-        {/* CARD */}
-        <View style={styles.formCard}>
-
-          {/* INPUT */}
-          <View style={styles.inputContainer}>
-
-            <HugeiconsIcon
+          <View style={styles.formCard}>
+            <InputField
+              label={stage === 'email' ? 'Email address' : 'Verification code'}
               icon={
-                stage === 'email'
-                  ? Mail01Icon
-                  : SecurityCheckIcon
+                <HugeiconsIcon
+                  icon={stage === 'email' ? Mail01Icon : SecurityCheckIcon}
+                  color={Colors.primary}
+                  size={20}
+                />
               }
-              color={Colors.primary}
-              size={20}
-            />
-
-            <TextInput
-              onChangeText={
-                stage === 'email'
-                  ? setEmail
-                  : setCode
-              }
-
-              value={
-                stage === 'email'
-                  ? email
-                  : code
-              }
-
-              placeholder={
-                stage === 'email'
-                  ? 'Enter your email'
-                  : '000000'
-              }
-
-              placeholderTextColor={Colors.textMuted}
-
+              onChangeText={stage === 'email' ? setEmail : setCode}
+              value={stage === 'email' ? email : code}
+              placeholder={stage === 'email' ? 'you@email.com' : '000000'}
               autoCapitalize="none"
-              autoCorrect={false}
-
-              keyboardType={
-                stage === 'email'
-                  ? 'email-address'
-                  : 'number-pad'
-              }
-
-              maxLength={
-                stage === 'email'
-                  ? 100
-                  : 6
-              }
-
+              keyboardType={stage === 'email' ? 'email-address' : 'number-pad'}
+              maxLength={stage === 'email' ? 100 : 8}
               editable={!loading}
-
-              style={[
-                styles.input,
-                stage === 'code' &&
-                  styles.codeInput,
-              ]}
+              style={stage === 'code' ? styles.codeInput : undefined}
             />
 
+            <PrimaryButton
+              onPress={stage === 'email' ? sendCode : verifyCode}
+              disabled={loading}
+              loading={loading}
+            >
+              {stage === 'email' ? 'Send login code' : 'Verify & continue'}
+            </PrimaryButton>
           </View>
 
-          {/* BUTTON */}
-          <TouchableOpacity
-            activeOpacity={0.85}
+          {stage === 'code' ? (
+            <View style={styles.codeActions}>
+              <TouchableOpacity onPress={sendCode} disabled={loading} activeOpacity={0.75}>
+                <Text style={styles.switchText}>Resend code</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => { setStage('email'); setCode(''); }}
+                disabled={loading}
+                activeOpacity={0.75}
+              >
+                <Text style={[styles.switchText, styles.switchTextMuted]}>Use a different email</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
 
-            style={[
-              styles.button,
-              loading && styles.buttonDisabled,
-            ]}
-
-            disabled={loading}
-
-            onPress={
-              stage === 'email'
-                ? sendCode
-                : verifyCode
-            }
-          >
-
-            {loading ? (
-
-              <ActivityIndicator color="#FFFFFF" />
-
-            ) : (
-
-              <View style={styles.buttonContent}>
-
-                <Text style={styles.buttonText}>
-                  {stage === 'email'
-                    ? 'Continue'
-                    : 'Verify Code'}
-                </Text>
-
-                <View style={styles.buttonArrow}>
-                  <Text style={styles.arrowText}>
-                    →
-                  </Text>
-                </View>
-
-              </View>
-
-            )}
-
-          </TouchableOpacity>
-
-          {/* SWITCH */}
-          {stage === 'code' && (
-
-            <TouchableOpacity
-              onPress={() => {
-                setStage('email');
-                setCode('');
-              }}
-            >
-
-              <Text style={styles.switchText}>
-                Use another email
-              </Text>
-
-            </TouchableOpacity>
-
-          )}
-
+          <CopyrightFooter compact />
         </View>
-
-        {/* FOOTER */}
-        <View style={styles.footer}>
-
-          <Text style={styles.footerText}>
-            BUILDING SMARTER COMMUNITIES
-          </Text>
-
-        </View>
-
       </KeyboardAvoidingView>
-
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 40,
-  },
-
-  topCircle: {
-    position: 'absolute',
-    top: -80,
-    right: -80,
-
-    width: 240,
-    height: 240,
-
-    borderRadius: 999,
-
-    backgroundColor: Colors.primarySoft,
-    opacity: 0.9,
-  },
-
-  bottomCircle: {
-    position: 'absolute',
-    bottom: -120,
-    left: -120,
-
-    width: 260,
-    height: 260,
-
-    borderRadius: 999,
-
-    backgroundColor: Colors.accentSoft,
-    opacity: 0.8,
-  },
-
-  heroSection: {
-    alignItems: 'center',
-    width: '100%',
-    maxWidth: 520,
-  },
-
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-
-  logoOuterGlow: {
-    position: 'absolute',
-
-    width: width < 500 ? 120 : 150,
-    height: width < 500 ? 120 : 150,
-
-    borderRadius: 999,
-
-    backgroundColor: Colors.primarySoft,
-
-    opacity: 0.5,
-
-    top: -10,
-  },
-
-  logoCircle: {
-    width: width < 500 ? 95 : 120,
-    height: width < 500 ? 95 : 120,
-
-    borderRadius: 999,
-
-    backgroundColor: Colors.primary,
-
-    justifyContent: 'center',
-    alignItems: 'center',
-
-    shadowColor: Colors.primary,
-    shadowOffset: {
-      width: 0,
-      height: 14,
-    },
-
-    shadowOpacity: 0.28,
-    shadowRadius: 20,
-    elevation: 12,
-  },
-
-  logoInnerCircle: {
-    width: '82%',
-    height: '82%',
-
-    borderRadius: 999,
-
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.15)',
-
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  logoS: {
-    color: '#FFFFFF',
-
-    fontSize: width < 500 ? 42 : 54,
-
-    fontWeight: '900',
-
-    letterSpacing: 1,
-  },
-
-  logoText: {
-    marginTop: 18,
-
-    color: Colors.text,
-
-    fontSize: width < 500 ? 30 : 42,
-
-    fontWeight: '900',
-
-    letterSpacing: -1.5,
-  },
-
-  logoTagline: {
-    marginTop: 6,
-
-    color: Colors.textSecondary,
-
-    fontSize: width < 500 ? 13 : 15,
-
-    letterSpacing: 1,
-  },
-
-  smallHeading: {
-    marginTop: 30,
-
-    color: Colors.accent,
-
-    fontWeight: '700',
-
-    fontSize: width < 500 ? 12 : 14,
-
-    letterSpacing: 2,
-    textAlign: 'center',
-  },
-
-  title: {
-    marginTop: 12,
-
-    fontSize: width < 500 ? 34 : 58,
-
-    color: Colors.text,
-
-    fontWeight: '800',
-    textAlign: 'center',
-  },
-
-  subtitle: {
-    marginTop: 20,
-
-    color: Colors.textSecondary,
-
-    fontSize: width < 500 ? 15 : 18,
-
-    lineHeight: width < 500 ? 24 : 32,
-
-    textAlign: 'center',
-
-    maxWidth: 620,
-  },
-
-  formCard: {
-    width: '100%',
-    maxWidth: 520,
-
-    marginTop: 50,
-
+  container: { flex: 1, backgroundColor: Colors.background },
+  flex: { flex: 1 },
+  close: {
+    margin: Spacing.md,
+    width: 44,
+    height: 44,
+    borderRadius: BorderRadius.sm,
     backgroundColor: Colors.surface,
-
-    borderRadius: 36,
-
-    paddingVertical: 26,
-    paddingHorizontal: width < 500 ? 18 : 26,
-
+    alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
     borderColor: Colors.border,
-
+    alignSelf: 'flex-end',
+    ...Shadow.sm,
+  },
+  content: {
+    padding: Spacing.xl,
+    gap: Spacing.lg,
+    flex: 1,
+    justifyContent: 'center',
+    maxWidth: SCREEN_MAX_WIDTH,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  hero: { alignItems: 'center', gap: Spacing.xs, marginBottom: Spacing.sm },
+  heroMark: {
+    width: 76,
+    height: 76,
+    borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Shadow.lg,
+  },
+  brand: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    color: Colors.primary,
+    fontFamily: Fonts.heading,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    marginTop: Spacing.sm,
+  },
+  brandTag: {
+    fontSize: FontSize.xs,
+    color: Colors.textMuted,
+    fontFamily: Fonts.sans,
+  },
+  title: {
+    fontSize: FontSize.xxl,
+    fontWeight: FontWeight.heavy,
+    color: Colors.text,
+    letterSpacing: -0.6,
+    fontFamily: Fonts.heading,
+  },
+  subtitle: {
+    fontSize: FontSize.md,
+    color: Colors.textSecondary,
+    lineHeight: 24,
+    fontFamily: Fonts.sans,
+  },
+  formCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.lg,
+    gap: Spacing.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
     ...Shadow.md,
   },
-
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-
-    width: '100%',
-
-    minHeight: width < 500 ? 60 : 70,
-
-    borderRadius: 22,
-
-    backgroundColor: Colors.surfaceMuted,
-
-    borderWidth: 1,
-    borderColor: Colors.border,
-
-    paddingHorizontal: width < 500 ? 16 : 20,
-  },
-
-  input: {
-    flex: 1,
-
-    color: Colors.text,
-
-    fontSize: width < 500 ? 15 : 16,
-
-    fontWeight: '600',
-
-    marginLeft: 12,
-  },
-
-  codeInput: {
-    letterSpacing: width < 500 ? 6 : 10,
-    textAlign: 'center',
-  },
-
-  button: {
-    width: '100%',
-
-    minHeight: width < 500 ? 58 : 68,
-
-    marginTop: 24,
-
-    borderRadius: 24,
-
-    backgroundColor: Colors.accent,
-
-    justifyContent: 'center',
-    alignItems: 'center',
-
-    overflow: 'hidden',
-
-    shadowColor: Colors.accent,
-    shadowOffset: {
-      width: 0,
-      height: 12,
-    },
-
-    shadowOpacity: 0.28,
-    shadowRadius: 18,
-    elevation: 10,
-  },
-
-  buttonDisabled: {
-    opacity: 0.75,
-    transform: [{ scale: 0.98 }],
-  },
-
-  buttonContent: {
-    width: '100%',
-
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-
-    position: 'relative',
-  },
-
-  buttonText: {
-    color: '#FFFFFF',
-
-    fontSize: width < 500 ? 16 : 18,
-
-    fontWeight: '800',
-
-    letterSpacing: 0.4,
-  },
-
-  buttonArrow: {
-    position: 'absolute',
-    right: 18,
-
-    width: 34,
-    height: 34,
-
-    borderRadius: 999,
-
-    backgroundColor: 'rgba(255,255,255,0.18)',
-
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  arrowText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '700',
-  },
-
+  codeInput: { letterSpacing: 8, textAlign: 'center', fontWeight: FontWeight.semibold },
+  codeActions: { gap: Spacing.sm, alignItems: 'center' },
   switchText: {
-    marginTop: 20,
-
-    textAlign: 'center',
-
     color: Colors.primary,
-
-    fontSize: width < 500 ? 14 : 15,
-
-    fontWeight: '600',
-  },
-
-  footer: {
-    marginTop: 38,
-  },
-
-  footerText: {
-    color: Colors.textMuted,
-
-    fontSize: width < 500 ? 11 : 13,
-
-    fontWeight: '700',
-
-    letterSpacing: 3,
     textAlign: 'center',
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    fontFamily: Fonts.sans,
   },
+  switchTextMuted: { color: Colors.textSecondary, fontWeight: FontWeight.medium },
 });

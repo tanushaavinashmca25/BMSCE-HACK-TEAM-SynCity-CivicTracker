@@ -1,39 +1,54 @@
+/**
+ * SynCity — Clean Minimalist Light design system
+ * Palette: primary (civic blue) · accent (action orange) · background · surface
+ */
+import { Platform } from 'react-native';
+
 export const Colors = {
-  // Brand - Navy & Orange
-  primary: '#1E3A8A',         // Navy Blue
-  primaryDark: '#172554',     // Dark Navy
-  primarySoft: '#DBEAFE',     // Soft Blue
+  primary: '#0B2D6B',
+  primaryDark: '#071E4A',
+  primarySoft: '#E8EEF8',
+  accent: '#E85D04',
+  accentSoft: '#FFF4ED',
 
-  accent: '#F97316',          // Orange
-  accentSoft: '#FFEDD5',      // Soft Orange
-
-  // Semantic
-  success: '#10B981',
+  success: '#047857',
   successSoft: '#D1FAE5',
-
-  danger: '#EF4444',
-  dangerSoft: '#FEF2F2',
-
-  warning: '#F59E0B',
+  danger: '#B91C1C',
+  dangerSoft: '#FEE2E2',
+  warning: '#B45309',
   warningSoft: '#FEF3C7',
+  info: '#0369A1',
+  infoSoft: '#E0F2FE',
 
-  info: '#3B82F6',
-  infoSoft: '#EFF6FF',
+  background: '#F5F7FA',
+  surface: '#FFFFFF',
+  surfaceMuted: '#F0F3F8',
+  text: '#0C1222',
+  textSecondary: '#4B5568',
+  textMuted: '#9CA3AF',
+  border: '#E5E9F0',
+  borderStrong: '#CBD5E1',
+  overlay: 'rgba(12, 18, 34, 0.52)',
+};
 
-  // Neutrals
-  background: '#FFFFFF',
+export const Fonts = {
+  sans: Platform.select({
+    web: '"Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif',
+    ios: 'System',
+    android: 'Roboto',
+    default: 'System',
+  }),
+  heading: Platform.select({
+    web: '"Plus Jakarta Sans", "Inter", system-ui, sans-serif',
+    ios: 'System',
+    android: 'Roboto',
+    default: 'System',
+  }),
+};
 
-  surface: '#F8FAFC',
-  surfaceMuted: '#F1F5F9',
-
-  text: '#0F172A',
-  textSecondary: '#334155',
-  textMuted: '#64748B',
-
-  border: '#E2E8F0',
-  borderStrong: '#94A3B8',
-
-  overlay: 'rgba(15, 23, 42, 0.6)',
+export const Motion = {
+  duration: 180,
+  easing: 'ease-in-out' as const,
 };
 
 export const Spacing = {
@@ -44,15 +59,16 @@ export const Spacing = {
   lg: 24,
   xl: 32,
   xxl: 48,
+  section: 56,
 };
 
 export const BorderRadius = {
-  xs: 4,
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 20,
-  xxl: 28,
+  xs: 8,
+  sm: 12,
+  md: 16,
+  lg: 20,
+  xl: 24,
+  xxl: 32,
   round: 999,
 };
 
@@ -63,8 +79,8 @@ export const FontSize = {
   lg: 17,
   xl: 20,
   xxl: 24,
-  display: 32,
-  hero: 40,
+  display: 28,
+  hero: 34,
 };
 
 export const FontWeight = {
@@ -75,28 +91,32 @@ export const FontWeight = {
   heavy: '800' as const,
 };
 
+export const LineHeight = {
+  tight: 1.15,
+  normal: 1.5,
+  relaxed: 1.65,
+};
+
 export const Shadow = {
   sm: {
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 2,
+    shadowColor: '#0C1222',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    elevation: 1,
   },
-
   md: {
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 6 },
+    shadowColor: '#0B2D6B',
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 14,
     elevation: 4,
   },
-
   lg: {
-    shadowColor: '#1E3A8A',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.22,
+    shadowColor: '#0B2D6B',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.14,
     shadowRadius: 24,
-    elevation: 10,
+    elevation: 8,
   },
 };
