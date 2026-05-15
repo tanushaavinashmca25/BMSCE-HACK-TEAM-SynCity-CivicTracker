@@ -1,4 +1,4 @@
-# Civic Tracker
+# SynCity Tracker
 
 Crowd-sourced civic-issue reporting with AI verification. Citizens report potholes / garbage / utility faults; a YOLOv8 service decides if the photo actually shows what the user claims, and verified reports are routed to municipal officers via a dashboard.
 
