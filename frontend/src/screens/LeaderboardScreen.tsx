@@ -292,10 +292,11 @@ const styles = StyleSheet.create({
 
     borderRadius: 999,
   },
-
   metricVal: {
     fontSize: 10,
     fontWeight: FontWeight.heavy,
     color: '#7A869A',
   },
+
+
 });
