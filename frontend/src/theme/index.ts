@@ -1,30 +1,38 @@
 export const Colors = {
-  // Brand - Deep Slate & Emerald
-  primary: '#0F172A',         // Slate 900 (Deep Civic Blue)
-  primaryDark: '#020617',
-  primarySoft: '#F1F5F9',
-  accent: '#10B981',          // Emerald 500 (Growth/Action)
-  accentSoft: '#ECFDF5',
+  // Brand - Navy & Orange
+  primary: '#1E3A8A',         // Navy Blue
+  primaryDark: '#172554',     // Dark Navy
+  primarySoft: '#DBEAFE',     // Soft Blue
+
+  accent: '#F97316',          // Orange
+  accentSoft: '#FFEDD5',      // Soft Orange
 
   // Semantic
   success: '#10B981',
   successSoft: '#D1FAE5',
+
   danger: '#EF4444',
   dangerSoft: '#FEF2F2',
+
   warning: '#F59E0B',
   warningSoft: '#FEF3C7',
+
   info: '#3B82F6',
   infoSoft: '#EFF6FF',
 
   // Neutrals
-  background: '#F8FAFC',      // Slate 50
-  surface: '#FFFFFF',
+  background: '#FFFFFF',
+
+  surface: '#F8FAFC',
   surfaceMuted: '#F1F5F9',
-  text: '#0F172A',            // Slate 900
-  textSecondary: '#475569',   // Slate 600
-  textMuted: '#94A3B8',       // Slate 400
-  border: '#E2E8F0',          // Slate 200
-  borderStrong: '#CBD5E1',    // Slate 300
+
+  text: '#0F172A',
+  textSecondary: '#334155',
+  textMuted: '#64748B',
+
+  border: '#E2E8F0',
+  borderStrong: '#94A3B8',
+
   overlay: 'rgba(15, 23, 42, 0.6)',
 };
 
@@ -75,6 +83,7 @@ export const Shadow = {
     shadowRadius: 6,
     elevation: 2,
   },
+
   md: {
     shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 6 },
@@ -82,10 +91,11 @@ export const Shadow = {
     shadowRadius: 14,
     elevation: 4,
   },
+
   lg: {
-    shadowColor: '#6366F1',
+    shadowColor: '#1E3A8A',
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.22,
     shadowRadius: 24,
     elevation: 10,
   },
