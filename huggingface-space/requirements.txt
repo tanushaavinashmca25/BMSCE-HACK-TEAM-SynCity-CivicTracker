@@ -1,0 +1,10 @@
+fastapi==0.118.0
+uvicorn[standard]==0.34.0
+httpx==0.28.1
+pydantic==2.10.6
+ultralytics==8.3.55
+huggingface_hub==0.27.1
+Pillow==11.1.0
+# torch CPU is large; pin a known-good version
+torch==2.5.1
+torchvision==0.20.1

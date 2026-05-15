@@ -1,0 +1,17 @@
+{
+  "name": "civic-main",
+  "version": "1.0.0",
+  "description": "Crowd-sourced civic-issue reporting with AI verification. Citizens report potholes / garbage / utility faults; a YOLOv8 service decides if the photo actually shows what the user claims, and verified reports are routed to municipal officers via a dashboard.",
+  "main": "index.js",
+  "scripts": {
+    "supabase": "supabase",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "supabase": "^2.98.2"
+  }
+}
