@@ -168,6 +168,7 @@ export default function ReportScreen({ route, navigation }: any) {
             multiline
             value={description}
             onChangeText={setDescription}
+            underlineColorAndroid="transparent"
           />
         </View>
 
@@ -249,7 +250,13 @@ const styles = StyleSheet.create({
   catGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   catChip: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 10, borderRadius: BorderRadius.lg, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   catChipText: { fontSize: FontSize.sm, fontWeight: FontWeight.bold, color: Colors.textMuted },
-  input: { backgroundColor: Colors.surface, padding: Spacing.md, borderRadius: BorderRadius.lg, color: Colors.text, fontSize: FontSize.md, minHeight: 80, textAlignVertical: 'top', borderWidth: 1, borderColor: Colors.border },
+  input: { 
+    backgroundColor: Colors.surface, padding: Spacing.md, borderRadius: BorderRadius.lg, 
+    color: Colors.text, fontSize: FontSize.md, minHeight: 80, textAlignVertical: 'top', 
+    borderWidth: 1, borderColor: Colors.border,
+    // @ts-ignore
+    outlineStyle: 'none',
+  },
   infoRow: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: Colors.accentSoft, padding: Spacing.md, borderRadius: BorderRadius.lg },
   infoText: { flex: 1, fontSize: 12, color: Colors.accent, fontWeight: FontWeight.bold, lineHeight: 18 },
   submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, backgroundColor: Colors.primary, height: 56, borderRadius: BorderRadius.xl, ...Shadow.lg },

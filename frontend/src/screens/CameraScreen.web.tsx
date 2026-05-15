@@ -29,6 +29,13 @@ export default function CameraScreen({ navigation }: any) {
       () => setLocDenied(true),
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 },
     );
+
+    // Warm up HF Space
+    const url = process.env.EXPO_PUBLIC_YOLO_URL;
+    if (url) {
+      fetch(url, { method: 'GET' }).catch(() => {});
+    }
+
     return () => navigator.geolocation.clearWatch(id);
   }, []);
 

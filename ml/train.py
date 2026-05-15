@@ -96,7 +96,7 @@ def main():
     ap.add_argument("--model-size", default="m", choices=["n", "s", "m", "l"])
     ap.add_argument("--skip-pothole", action="store_true")
     ap.add_argument("--skip-garbage", action="store_true")
-    ap.add_argument("--upload-hf", help="HF Space repo id, e.g. arjun-vegeta/civic-yolo")
+    ap.add_argument("--upload-hf", help="HF Space repo id, e.g. civic-yolo")
     args = ap.parse_args()
 
     pothole_pt = None

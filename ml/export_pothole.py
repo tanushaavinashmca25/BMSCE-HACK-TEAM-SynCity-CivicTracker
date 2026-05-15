@@ -2,7 +2,7 @@
 Download mostsayed93's public Pothole YOLOv8 weights and export to TFLite
 for use with react-native-fast-tflite.
 
-Run from /Users/arjun/Documents/GitHub/civic/ml:
+Run from /ml:
     source .venv/bin/activate
     python export_pothole.py
 """

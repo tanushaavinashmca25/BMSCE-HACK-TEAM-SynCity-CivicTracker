@@ -75,7 +75,7 @@ npm install
 npm run dev
 ```
 
-YOLO inference runs on the HuggingFace Space (`huggingface-space/`). It's already deployed at `https://arjun-vegeta-civic-yolo.hf.space`. See `huggingface-space/README.md` for redeploy.
+YOLO inference runs on the HuggingFace Space (`huggingface-space/`). It's already deployed at `https://civic-yolo.hf.space`. See `huggingface-space/README.md` for redeploy.
 
 To retrain the detectors, see `ml/README.md` (free Colab T4, ~30-60 min).
 

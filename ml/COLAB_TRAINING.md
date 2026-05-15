@@ -27,19 +27,19 @@ os.environ["HF_TOKEN"] = getpass.getpass("HF write token (optional): ")
 ### Cell 4 — run it
 
 ```python
-!python train.py --epochs 150 --model-size m --upload-hf arjun-vegeta/civic-yolo
+!python train.py --epochs 150 --model-size m --upload-hf civic-yolo
 ```
 
 When the run finishes:
 - `runs/detect/pothole_v2/weights/best.pt`
 - `runs/detect/garbage_v2/weights/best.pt`
-- both auto-uploaded to `huggingface.co/spaces/arjun-vegeta/civic-yolo/weights/`
+- both auto-uploaded to `huggingface.co/spaces/civic-yolo/weights/`
 
 ### Cell 5 — restart the Space so it picks up the new weights
 
 ```python
 from huggingface_hub import HfApi
-HfApi().restart_space(repo_id="arjun-vegeta/civic-yolo")
+HfApi().restart_space(repo_id="civic-yolo")
 ```
 
 That's it. The Space's `app.py` already prefers `weights/*_v2.pt` if present, so no app code change.
@@ -47,7 +47,7 @@ That's it. The Space's `app.py` already prefers `weights/*_v2.pt` if present, so
 ### Sanity-check post-deploy
 
 ```bash
-curl -X POST https://arjun-vegeta-civic-yolo.hf.space/detect \
+curl -X POST https://civic-yolo.hf.space/detect \
   -H "Authorization: Bearer $YOLO_SERVICE_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"image_url":"https://images.pexels.com/photos/280221/pexels-photo-280221.jpeg"}'

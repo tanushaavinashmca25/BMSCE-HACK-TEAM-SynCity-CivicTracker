@@ -1,7 +1,7 @@
 """
 Download esapzoi/litter-detection-yolov8 from HuggingFace and export to TFLite.
 
-Run from /Users/arjun/Documents/GitHub/civic/ml (after setting up the venv per export_pothole.py):
+Run from /ml (after setting up the venv per export_pothole.py):
     source .venv/bin/activate
     python export_garbage.py
 """

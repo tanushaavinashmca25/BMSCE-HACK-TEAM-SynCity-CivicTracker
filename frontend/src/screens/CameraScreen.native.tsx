@@ -20,6 +20,12 @@ export default function CameraScreen({ navigation }: any) {
       setLocationPermission(status === 'granted');
       if (!hasPermission) await requestPermission();
     })();
+
+    // Warm up HF Space
+    const url = process.env.EXPO_PUBLIC_YOLO_URL;
+    if (url) {
+      fetch(url, { method: 'GET' }).catch(() => {});
+    }
   }, [hasPermission, requestPermission]);
 
   useEffect(() => {
