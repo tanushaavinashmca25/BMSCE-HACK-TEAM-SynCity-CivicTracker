@@ -68,12 +68,12 @@ class GeminiService:
            Set it to "Ambiguous" if you are unsure.
 
         Return the result in JSON format:
-        {
+        {{
             "enhanced_description": "...",
             "urgency_score": 1-5,
             "hazards": ["...", "..."],
             "ai_verification_status": "Verified" | "Ambiguous" | "Inauthentic"
-        }
+        }}
         """
 
         try:
