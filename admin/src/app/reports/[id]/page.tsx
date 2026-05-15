@@ -2,12 +2,30 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
-  ArrowLeft, MapPin, Shield, User as UserIcon, MessageSquare, CheckCircle,
+  ArrowLeft,
+  MapPin,
+  Shield,
+  User as UserIcon,
+  MessageSquare,
+  CheckCircle2,
+  AlertTriangle,
+  Send,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { NativeSelect } from "@/components/ui/native-select";
+import { Separator } from "@/components/ui/separator";
+import { ReportMap } from "@/components/report-map";
 import { adminApi, STATUSES } from "@/lib/api";
-import { STATUS_COLORS, timeAgo } from "@/lib/format";
+import { STATUS_COLORS, STATUS_FALLBACK, timeAgo } from "@/lib/format";
 import { postUpdate } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -34,26 +52,26 @@ export default async function ReportDetailPage({
   const action = postUpdate.bind(null, id);
 
   return (
-    <div className="p-8 space-y-6 bg-slate-50 min-h-screen">
-      <div className="flex items-center justify-between gap-4 flex-wrap">
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to dashboard
         </Link>
         <span
-          className={`text-sm font-semibold inline-flex items-center rounded-full px-3 py-1 ring-1 ${
-            STATUS_COLORS[report.status] || "bg-slate-100 text-slate-700 ring-slate-200"
+          className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ring-1 ${
+            STATUS_COLORS[report.status] || STATUS_FALLBACK
           }`}
         >
           {report.status}
         </span>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
           <Card className="overflow-hidden">
             {report.image_url ? (
               <Image
@@ -61,53 +79,81 @@ export default async function ReportDetailPage({
                 alt={report.category}
                 width={1200}
                 height={800}
-                className="w-full h-80 object-cover bg-slate-100"
+                className="h-80 w-full bg-muted object-cover"
                 unoptimized
               />
             ) : (
-              <div className="w-full h-80 bg-slate-100" />
+              <div className="h-80 w-full bg-muted" />
             )}
-            <CardContent className="space-y-4 pt-6">
+            <CardContent className="space-y-4 pt-2">
               <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h1 className="text-2xl font-bold">{report.category}</h1>
+                <div className="space-y-1">
+                  <h1 className="font-heading text-2xl font-semibold tracking-tight">
+                    {report.category}
+                  </h1>
                   <p className="text-sm text-muted-foreground">
-                    Reported {timeAgo(report.created_at)} ·
-                    {" "}
-                    urgency {report.urgency_score}/5
+                    Reported {timeAgo(report.created_at)}
                   </p>
+                </div>
+                <span
+                  className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold ${
+                    report.urgency_score >= 4
+                      ? "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  <AlertTriangle className="h-3 w-3" />
+                  Urgency {report.urgency_score}/5
+                </span>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-2 text-sm">
+                {report.address ? (
+                  <div className="flex items-start gap-2">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span>{report.address}</span>
+                  </div>
+                ) : null}
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <MapPin className="h-4 w-4" />
+                  <span className="font-mono text-xs">
+                    {report.location?.latitude?.toFixed(5)},{" "}
+                    {report.location?.longitude?.toFixed(5)}
+                  </span>
                 </div>
               </div>
 
-              {report.address ? (
-                <div className="flex items-center gap-2 text-sm text-slate-700">
-                  <MapPin className="h-4 w-4 text-slate-500" />
-                  {report.address}
+              {typeof report.location?.latitude === "number" &&
+              typeof report.location?.longitude === "number" ? (
+                <div className="space-y-1.5">
+                  <Label>Location</Label>
+                  <ReportMap
+                    id={report.id}
+                    latitude={report.location.latitude}
+                    longitude={report.location.longitude}
+                    status={report.status}
+                    height={260}
+                  />
                 </div>
               ) : null}
 
-              <div className="flex items-center gap-2 text-sm text-slate-500">
-                <MapPin className="h-4 w-4" />
-                {report.location?.latitude?.toFixed(5)},
-                {" "}
-                {report.location?.longitude?.toFixed(5)}
-              </div>
-
               {report.description ? (
-                <div>
-                  <h2 className="text-sm font-semibold mb-1">Description</h2>
-                  <p className="text-sm text-slate-700 whitespace-pre-wrap">
+                <div className="space-y-1">
+                  <Label>Description</Label>
+                  <p className="whitespace-pre-wrap text-sm">
                     {report.description}
                   </p>
                 </div>
               ) : null}
 
               {report.user_note ? (
-                <div className="bg-indigo-50 border border-indigo-100 rounded-md p-3">
-                  <h2 className="text-xs font-semibold uppercase tracking-wide text-indigo-700">
+                <div className="rounded-md border border-indigo-200 bg-indigo-50 p-3 dark:border-indigo-500/25 dark:bg-indigo-500/10">
+                  <h2 className="text-xs font-semibold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
                     Note from reporter
                   </h2>
-                  <p className="text-sm text-indigo-900 mt-1 whitespace-pre-wrap">
+                  <p className="mt-1 whitespace-pre-wrap text-sm text-indigo-900 dark:text-indigo-100">
                     {report.user_note}
                   </p>
                 </div>
@@ -118,52 +164,57 @@ export default async function ReportDetailPage({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
-                <MessageSquare className="h-4 w-4 text-slate-500" />
+                <MessageSquare className="h-4 w-4 text-muted-foreground" />
                 Progress &amp; comments
               </CardTitle>
+              <CardDescription>
+                Timeline of status changes and authority responses.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {updates.length === 0 ? (
-                <p className="text-sm text-muted-foreground py-4">
+                <p className="py-6 text-sm text-muted-foreground">
                   No updates yet. Post a status change or a comment below.
                 </p>
               ) : (
-                <ol className="relative border-l border-slate-200 ml-3 space-y-6">
+                <ol className="relative ml-3 space-y-6 border-l border-border">
                   {updates.map((u) => {
                     const isAuthority = u.author_role === "authority";
                     return (
                       <li key={u.id} className="ml-4">
                         <span
-                          className={`absolute -left-2.5 flex h-5 w-5 items-center justify-center rounded-full ring-4 ring-white ${
-                            isAuthority ? "bg-sky-500" : "bg-indigo-500"
+                          className={`absolute -left-[11px] flex h-5 w-5 items-center justify-center rounded-full ring-4 ring-background ${
+                            isAuthority
+                              ? "bg-sky-500 text-white"
+                              : "bg-indigo-500 text-white"
                           }`}
                         >
                           {isAuthority ? (
-                            <Shield className="h-3 w-3 text-white" />
+                            <Shield className="h-3 w-3" />
                           ) : (
-                            <UserIcon className="h-3 w-3 text-white" />
+                            <UserIcon className="h-3 w-3" />
                           )}
                         </span>
-                        <div className="flex items-center gap-2 text-xs text-slate-500">
-                          <span className="font-semibold text-slate-700">
-                            {u.author_name || (isAuthority ? "Operations" : "Citizen")}
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span className="font-semibold text-foreground">
+                            {u.author_name ||
+                              (isAuthority ? "Operations" : "Citizen")}
                           </span>
                           <span>·</span>
                           <span>{timeAgo(u.created_at)}</span>
                         </div>
                         {u.status_to ? (
                           <span
-                            className={`mt-1 inline-flex items-center gap-1 text-xs font-semibold rounded-full px-2 py-0.5 ring-1 ${
-                              STATUS_COLORS[u.status_to] ||
-                              "bg-slate-100 text-slate-700 ring-slate-200"
+                            className={`mt-1.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ${
+                              STATUS_COLORS[u.status_to] || STATUS_FALLBACK
                             }`}
                           >
-                            <CheckCircle className="h-3 w-3" />
+                            <CheckCircle2 className="h-3 w-3" />
                             Status → {u.status_to}
                           </span>
                         ) : null}
                         {u.note ? (
-                          <p className="text-sm text-slate-700 mt-1 whitespace-pre-wrap">
+                          <p className="mt-1.5 whitespace-pre-wrap text-sm">
                             {u.note}
                           </p>
                         ) : null}
@@ -177,20 +228,21 @@ export default async function ReportDetailPage({
         </div>
 
         <div>
-          <Card className="sticky top-6">
+          <Card className="sticky top-20">
             <CardHeader>
               <CardTitle className="text-base">Post update</CardTitle>
+              <CardDescription>
+                Notify the reporter and move the report forward.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <form action={action} className="space-y-3">
-                <div>
-                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Change status (optional)
-                  </label>
-                  <select
+              <form action={action} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="status_to">Change status (optional)</Label>
+                  <NativeSelect
+                    id="status_to"
                     name="status_to"
                     defaultValue=""
-                    className="mt-1 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="">— No change —</option>
                     {STATUSES.map((s) => (
@@ -198,23 +250,22 @@ export default async function ReportDetailPage({
                         {s}
                       </option>
                     ))}
-                  </select>
+                  </NativeSelect>
                 </div>
-                <div>
-                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Comment
-                  </label>
-                  <textarea
+                <div className="space-y-1.5">
+                  <Label htmlFor="note">Comment</Label>
+                  <Textarea
+                    id="note"
                     name="note"
                     rows={4}
                     placeholder="What did you find? What's next?"
-                    className="mt-1 block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full" size="lg">
+                  <Send className="h-4 w-4" />
                   Post update
                 </Button>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   Reporters get notified and earn XP when their report is marked
                   Resolved or Verified.
                 </p>

@@ -38,7 +38,7 @@ The garbage dataset has multiple sub-classes (bottle / can / etc.). The HF Space
 1. Upload `train_colab.ipynb` (or the two parallel notebooks) to Colab.
 2. Runtime → Change runtime type → **T4 GPU**.
 3. Run all. Paste your Roboflow key + HF write token when prompted.
-4. The final cell uploads `pothole_v2.pt` / `garbage_v2.pt` to `arjun-vegeta/civic-yolo` and restarts the Space.
+4. The final cell uploads `pothole_v2.pt` / `garbage_v2.pt` to `civic-yolo` and restarts the Space.
 
 ## Quick start — local (small smoke test only)
 

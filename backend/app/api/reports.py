@@ -1,4 +1,5 @@
 import logging
+import asyncio
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status, Query
 from pydantic import BaseModel
@@ -122,23 +123,49 @@ def _award(target_user: str, xp: int, rep: int, kind: str, title: str, detail: s
 
 async def _verify_report_async(report_id: str, image_url: str, category: str, user_id: str):
     """
-    Background verification job: runs YOLO (truth) and Gemini (rich context).
-    YOLO determines verified/rejected. Gemini result is stored as additional
-    metadata for authorities — never used to gate XP.
+    Background verification job: runs YOLO and Gemini in parallel.
+    Either can verify the report.
     """
-    yolo = await yolo_service.verify(image_url, category)
-
-    # Gemini runs alongside for richer description / urgency / hazards.
-    gemini_result = {}
+    # Run both services in parallel to avoid one blocking the other
+    tasks = [
+        yolo_service.verify(image_url, category),
+        gemini_service.analyze_report(image_url, category, "", image_path=None)
+    ]
+    
     try:
-        gemini_result = await gemini_service.analyze_report(
-            image_url, category, "", image_path=None,
-        )
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        yolo = results[0]
+        gemini_result = results[1]
+        
+        # Handle potential exceptions from gather
+        if isinstance(yolo, Exception):
+            logger.error(f"YOLO verification failed for {report_id}: {yolo}")
+            yolo = yolo_service.YoloResult(False, False, 0.0, {}, error=str(yolo))
+        
+        if isinstance(gemini_result, Exception):
+            logger.error(f"Gemini analysis failed for {report_id}: {gemini_result}")
+            gemini_result = {}
+            
     except Exception as e:
-        logger.exception("gemini failed for %s: %s", report_id, e)
+        logger.exception(f"Critical error in verification job for {report_id}: {e}")
+        return
 
-    verified = yolo.ok and yolo.category_detected
-    new_status = "Verified" if verified else ("Rejected" if yolo.ok else "Pending Review")
+    gemini_status = gemini_result.get("ai_verification_status")
+    gemini_verified = gemini_status == "Verified"
+    verified = (yolo.ok and yolo.category_detected) or gemini_verified
+
+    if verified:
+        new_status = "Verified"
+    elif gemini_status == "Inauthentic":
+        new_status = "Rejected"
+    elif gemini_status == "Ambiguous" or not gemini_result:
+        # If Gemini is unsure or failed, don't let YOLO reject it. 
+        # Keep it as Pending Review for human triage.
+        new_status = "Pending Review"
+    else:
+        # Fallback to YOLO rejection only if we actually have a valid (non-ambiguous) Gemini result 
+        # that didn't verify it.
+        new_status = "Rejected" if yolo.ok else "Pending Review"
 
     update = {
         "status": new_status,

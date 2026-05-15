@@ -189,6 +189,7 @@ export default function ReportDetailScreen({ route, navigation }: any) {
             onChangeText={setNote}
             multiline
             maxLength={500}
+            underlineColorAndroid="transparent"
           />
           <TouchableOpacity
             style={[styles.sendBtn, (!note.trim() || sending) && { opacity: 0.5 }]}
@@ -259,6 +260,8 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     paddingHorizontal: Spacing.md, paddingVertical: 10,
     fontSize: FontSize.md, color: Colors.text,
+    // @ts-ignore
+    outlineStyle: 'none',
   },
   sendBtn: {
     width: 44, height: 44, borderRadius: 22,

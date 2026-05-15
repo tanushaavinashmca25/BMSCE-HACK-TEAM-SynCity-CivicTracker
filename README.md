@@ -1,4 +1,4 @@
-# Civic Tracker
+# SynCity Tracker
 
 Crowd-sourced civic-issue reporting with AI verification. Citizens report potholes / garbage / utility faults; a YOLOv8 service decides if the photo actually shows what the user claims, and verified reports are routed to municipal officers via a dashboard.
 
@@ -75,7 +75,7 @@ npm install
 npm run dev
 ```
 
-YOLO inference runs on the HuggingFace Space (`huggingface-space/`). It's already deployed at `https://arjun-vegeta-civic-yolo.hf.space`. See `huggingface-space/README.md` for redeploy.
+YOLO inference runs on the HuggingFace Space (`huggingface-space/`). It's already deployed at `https://civic-yolo.hf.space`. See `huggingface-space/README.md` for redeploy.
 
 To retrain the detectors, see `ml/README.md` (free Colab T4, ~30-60 min).
 

@@ -89,6 +89,7 @@ export default function AuthScreen() {
               maxLength={stage === 'email' ? 100 : 6}
               style={[styles.input, stage === 'code' && styles.codeInput]}
               editable={!loading}
+              underlineColorAndroid="transparent"
             />
           </View>
 
@@ -142,7 +143,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface, borderRadius: BorderRadius.xl, paddingHorizontal: Spacing.lg,
     height: 64, borderWidth: 1, borderColor: Colors.border, ...Shadow.sm,
   },
-  input: { flex: 1, color: Colors.text, fontSize: FontSize.lg, fontWeight: FontWeight.bold },
+  input: { 
+    flex: 1, color: Colors.text, fontSize: FontSize.lg, fontWeight: FontWeight.bold,
+    // @ts-ignore
+    outlineStyle: 'none',
+  },
   codeInput: { letterSpacing: 8, textAlign: 'center' },
   button: {
     backgroundColor: Colors.accent, height: 60, borderRadius: BorderRadius.xl,

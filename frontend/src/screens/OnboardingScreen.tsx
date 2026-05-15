@@ -70,13 +70,14 @@ export default function OnboardingScreen({ onDone }: Props) {
                 <TextInput
                   value={name}
                   onChangeText={setName}
-                  placeholder="e.g. Arjun Dev"
+                  placeholder="e.g. Alex Dev"
                   placeholderTextColor={Colors.textMuted}
                   style={styles.input}
                   editable={!loading}
                   autoCapitalize="words"
                   autoCorrect={false}
                   maxLength={80}
+                  underlineColorAndroid="transparent"
                 />
               </View>
             </View>
@@ -95,6 +96,7 @@ export default function OnboardingScreen({ onDone }: Props) {
                   keyboardType="phone-pad"
                   autoComplete="tel"
                   maxLength={32}
+                  underlineColorAndroid="transparent"
                 />
               </View>
               <Text style={styles.hint}>Used strictly for official verification and impact updates.</Text>
@@ -139,7 +141,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface, borderRadius: BorderRadius.xl, paddingHorizontal: Spacing.lg,
     height: 60, borderWidth: 1, borderColor: Colors.border, ...Shadow.sm,
   },
-  input: { flex: 1, color: Colors.text, fontSize: FontSize.md, fontWeight: FontWeight.bold },
+  input: { 
+    flex: 1, color: Colors.text, fontSize: FontSize.md, fontWeight: FontWeight.bold,
+    // @ts-ignore
+    outlineStyle: 'none',
+  },
   hint: { fontSize: 11, color: Colors.textMuted, fontWeight: FontWeight.medium, marginLeft: 4 },
   cta: {
     marginTop: 'auto', height: 60, borderRadius: BorderRadius.xl,

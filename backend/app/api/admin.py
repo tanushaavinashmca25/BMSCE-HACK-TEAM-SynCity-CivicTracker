@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks, Header
 from typing import List, Optional
+from datetime import datetime, timezone, timedelta
 from ..schemas import (
     ReportResponse, ReportUpdateEntry, ReportUpdateCreate, ReportStatus,
 )
 from ..db.supabase import supabase, supabase_admin
 from ..core.admin_auth import require_admin
+from ..api.reports import _verify_report_async
+from ..config import settings
 
 router = APIRouter()
 
@@ -128,3 +131,32 @@ async def admin_add_update(
             pass
 
     return ins.data[0]
+
+
+@router.post("/internal/retry-pending")
+async def retry_pending_reports(
+    background: BackgroundTasks,
+    x_internal_key: Optional[str] = Header(None),
+):
+    """Re-runs YOLO verification for reports stuck in 'Pending Review' > 5 min.
+    Intended to be called by an external cron every 5 min. Also serves as a
+    Render keep-alive ping. Authenticated by ADMIN_API_KEY when set."""
+    if settings.ADMIN_API_KEY and x_internal_key != settings.ADMIN_API_KEY:
+        raise HTTPException(status_code=401, detail="Invalid key")
+
+    cutoff = (datetime.now(timezone.utc) - timedelta(minutes=5)).isoformat()
+    client = supabase_admin or supabase
+    stuck = (
+        client.table("reports")
+        .select("id, image_url, category, user_id")
+        .eq("status", "Pending Review")
+        .lt("created_at", cutoff)
+        .limit(50)
+        .execute()
+    )
+    rows = stuck.data or []
+    for r in rows:
+        background.add_task(
+            _verify_report_async, r["id"], r["image_url"], r["category"], r["user_id"]
+        )
+    return {"retried": len(rows)}

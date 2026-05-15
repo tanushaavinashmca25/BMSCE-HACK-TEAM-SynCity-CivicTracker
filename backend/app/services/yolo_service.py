@@ -13,6 +13,7 @@ Response:
 """
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import Optional
 
@@ -69,9 +70,10 @@ async def verify(image_url: str, category: str) -> YoloResult:
 
     yolo_key = CATEGORY_TO_YOLO.get(category)
     if yolo_key is None:
-        # No YOLO model for this category (e.g. Utility Fault) — skip but report OK.
+        # No YOLO model for this category (e.g. Utility Fault) — skip and return ok=False
+        # so that it stays in 'Pending Review' for human triage.
         return YoloResult(
-            ok=True,
+            ok=False,
             category_detected=False,
             category_confidence=0.0,
             other_detections={},
@@ -83,19 +85,28 @@ async def verify(image_url: str, category: str) -> YoloResult:
         headers["Authorization"] = f"Bearer {settings.YOLO_SERVICE_TOKEN}"
 
     url = settings.YOLO_SERVICE_URL.rstrip("/") + "/detect"
-    try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            resp = await client.post(url, json={"image_url": image_url}, headers=headers)
-            resp.raise_for_status()
-            data = resp.json()
-    except httpx.HTTPError as e:
-        logger.exception("yolo call failed: %s", e)
+    last_err: Optional[Exception] = None
+    data = None
+    for attempt in range(3):
+        try:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(120.0, connect=10.0)) as client:
+                resp = await client.post(url, json={"image_url": image_url}, headers=headers)
+                resp.raise_for_status()
+                data = resp.json()
+                break
+        except httpx.HTTPError as e:
+            last_err = e
+            logger.warning("yolo attempt %d/3 failed: %s", attempt + 1, e)
+            if attempt < 2:
+                await asyncio.sleep(5 * (attempt + 1))  # 5s, then 10s
+
+    if data is None:
         return YoloResult(
             ok=False,
             category_detected=False,
             category_confidence=0.0,
             other_detections={},
-            error=str(e),
+            error=str(last_err),
         )
 
     target = data.get(yolo_key) or {}
