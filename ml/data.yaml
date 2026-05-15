@@ -1,0 +1,15 @@
+# YOLOv8 dataset config for civic issue detection.
+# Override `path` to point at your downloaded dataset root.
+# Each image must have a matching `.txt` annotation in YOLO format:
+#   <class_id> <x_center> <y_center> <width> <height>   (normalized 0-1)
+
+path: ./datasets/civic
+train: images/train
+val: images/val
+test: images/test  # optional
+
+# Class order must stay consistent with the frontend's label mapping.
+names:
+  0: pothole
+  1: garbage
+  2: utility_fault
