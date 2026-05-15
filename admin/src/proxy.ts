@@ -4,7 +4,7 @@ import { ADMIN_SESSION_COOKIE, verifySessionTokenEdge } from "@/lib/auth-edge";
 
 const PUBLIC_PATHS = ["/login", "/api/auth/login"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (
