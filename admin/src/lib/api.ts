@@ -1,4 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+export const STATUSES = [
+  "Reported",
+  "Pending Review",
+  "Rejected",
+  "Assigned",
+  "In-Progress",
+  "Resolved",
+  "Verified",
+] as const;
+
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   process.env.API_URL ||
@@ -97,12 +107,3 @@ export const adminApi = {
       body: JSON.stringify({ author_role: "authority", ...body }),
     }),
 };
-
-export const STATUSES = [
-  "Reported",
-  "Pending Review",
-  "Assigned",
-  "In-Progress",
-  "Resolved",
-  "Verified",
-] as const;
