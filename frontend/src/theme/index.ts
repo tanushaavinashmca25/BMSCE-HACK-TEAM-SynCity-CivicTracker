@@ -90,5 +90,3 @@ export const Shadow = {
     elevation: 10,
   },
 };
-
-};
