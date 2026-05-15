@@ -253,8 +253,8 @@ const styles = StyleSheet.create({
   locText: { color: 'white', fontSize: 10, fontWeight: FontWeight.bold },
   section: { gap: Spacing.sm },
   sectionLabel: { fontSize: FontSize.sm, fontWeight: FontWeight.heavy, color: Colors.text, textTransform: 'uppercase', letterSpacing: 1 },
-  catGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  catChip: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 10, borderRadius: BorderRadius.lg, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  catGrid: { flexDirection: 'row', gap: 12 },
+  catChip: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, borderRadius: BorderRadius.lg, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   catChipText: { fontSize: FontSize.sm, fontWeight: FontWeight.bold, color: Colors.textMuted },
   input: {
     backgroundColor: Colors.surface, padding: Spacing.md, borderRadius: BorderRadius.lg,
