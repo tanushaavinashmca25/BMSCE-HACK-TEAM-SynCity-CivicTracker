@@ -123,30 +123,179 @@ export default function LeaderboardScreen({ active = true }: { active?: boolean 
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  content: { padding: Spacing.lg, gap: Spacing.lg },
-  header: { gap: 4 },
-  title: { fontSize: FontSize.xxl, fontWeight: FontWeight.heavy, color: Colors.text },
-  subtitle: { fontSize: FontSize.sm, color: Colors.textSecondary, fontWeight: FontWeight.medium },
-  podium: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center', gap: Spacing.md, marginTop: Spacing.md },
-  podiumCol: { alignItems: 'center', flex: 1, gap: 4 },
-  winnerCol: { transform: [{ translateY: -10 }] },
-  podiumName: { fontSize: FontSize.xs, fontWeight: FontWeight.bold, color: Colors.text, marginTop: 4 },
-  podiumXp: { fontSize: 10, color: Colors.textMuted, fontWeight: FontWeight.heavy },
-  podiumBar: { 
-    width: '100%', borderTopLeftRadius: BorderRadius.lg, borderTopRightRadius: BorderRadius.lg,
-    alignItems: 'center', justifyContent: 'flex-start', paddingTop: 12,
+  container: {
+    flex: 1,
+    backgroundColor: '#F1F1F1',
   },
-  podiumRank: { fontWeight: FontWeight.heavy, fontSize: FontSize.lg },
-  list: { gap: Spacing.md },
-  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, backgroundColor: Colors.surface, padding: Spacing.md, borderRadius: BorderRadius.xl, borderWidth: 1, borderColor: Colors.border },
-  rank: { width: 28, textAlign: 'center', fontWeight: FontWeight.heavy, color: Colors.textMuted, fontSize: FontSize.sm },
-  rowInfo: { flex: 1, gap: 2 },
-  name: { fontSize: FontSize.md, fontWeight: FontWeight.bold, color: Colors.text },
-  level: { fontSize: 10, fontWeight: FontWeight.bold, color: Colors.textMuted, textTransform: 'uppercase' },
-  rowStats: { alignItems: 'flex-end', gap: 4 },
-  xp: { fontSize: FontSize.sm, fontWeight: FontWeight.heavy, color: Colors.primary },
-  metrics: { flexDirection: 'row', gap: 8 },
-  metric: { flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: Colors.surfaceMuted, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-  metricVal: { fontSize: 9, fontWeight: FontWeight.heavy, color: Colors.textSecondary },
+
+  content: {
+    padding: Spacing.lg,
+    gap: Spacing.lg,
+  },
+
+  header: {
+    gap: 6,
+    marginBottom: Spacing.sm,
+  },
+
+  title: {
+    fontSize: 36,
+    fontWeight: FontWeight.heavy,
+    color: '#1A2238',
+    letterSpacing: -1.2,
+  },
+
+  subtitle: {
+    fontSize: 15,
+    color: '#7A869A',
+    fontWeight: FontWeight.medium,
+    lineHeight: 22,
+  },
+
+  podium: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    gap: Spacing.md,
+    marginTop: Spacing.lg,
+    paddingBottom: Spacing.lg,
+  },
+
+  podiumCol: {
+    alignItems: 'center',
+    flex: 1,
+    gap: 6,
+  },
+
+  winnerCol: {
+    transform: [{ translateY: -18 }],
+  },
+
+  podiumName: {
+    fontSize: 13,
+    fontWeight: FontWeight.heavy,
+    color: '#1A2238',
+    marginTop: 6,
+    letterSpacing: 0.2,
+  },
+
+  podiumXp: {
+    fontSize: 12,
+    color: '#FF6B00',
+    fontWeight: FontWeight.heavy,
+    letterSpacing: 0.3,
+  },
+
+  podiumBar: {
+    width: '100%',
+    borderTopLeftRadius: 26,
+    borderTopRightRadius: 26,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: 16,
+    borderBottomWidth: 5,
+    borderBottomColor: '#FF6B00',
+
+    shadowColor: '#1F3A93',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.12,
+    shadowRadius: 18,
+    elevation: 8,
+  },
+
+  podiumRank: {
+    fontWeight: FontWeight.heavy,
+    fontSize: 34,
+    color: '#FFFFFF',
+    letterSpacing: -1,
+  },
+
+  list: {
+    gap: Spacing.md,
+  },
+
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+
+    backgroundColor: '#FFFFFF',
+
+    padding: Spacing.md,
+
+    borderRadius: 24,
+
+    borderWidth: 1,
+    borderColor: 'rgba(31,58,147,0.05)',
+
+    shadowColor: '#1A2238',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+
+    elevation: 3,
+  },
+
+  rank: {
+    width: 34,
+    textAlign: 'center',
+    fontWeight: FontWeight.heavy,
+    color: '#1F3A93',
+    fontSize: 18,
+  },
+
+  rowInfo: {
+    flex: 1,
+    gap: 3,
+  },
+
+  name: {
+    fontSize: 17,
+    fontWeight: FontWeight.heavy,
+    color: '#1A2238',
+    letterSpacing: -0.2,
+  },
+
+  level: {
+    fontSize: 12,
+    fontWeight: FontWeight.medium,
+    color: '#7A869A',
+    textTransform: 'capitalize',
+  },
+
+  rowStats: {
+    alignItems: 'flex-end',
+    gap: 6,
+  },
+
+  xp: {
+    fontSize: 16,
+    fontWeight: FontWeight.heavy,
+    color: '#1F3A93',
+    letterSpacing: 0.2,
+  },
+
+  metrics: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+
+  metric: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+
+    backgroundColor: '#F5F5F7',
+
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+
+    borderRadius: 999,
+  },
+
+  metricVal: {
+    fontSize: 10,
+    fontWeight: FontWeight.heavy,
+    color: '#7A869A',
+  },
 });
