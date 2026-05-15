@@ -70,9 +70,10 @@ async def verify(image_url: str, category: str) -> YoloResult:
 
     yolo_key = CATEGORY_TO_YOLO.get(category)
     if yolo_key is None:
-        # No YOLO model for this category (e.g. Utility Fault) — skip but report OK.
+        # No YOLO model for this category (e.g. Utility Fault) — skip and return ok=False
+        # so that it stays in 'Pending Review' for human triage.
         return YoloResult(
-            ok=True,
+            ok=False,
             category_detected=False,
             category_confidence=0.0,
             other_detections={},

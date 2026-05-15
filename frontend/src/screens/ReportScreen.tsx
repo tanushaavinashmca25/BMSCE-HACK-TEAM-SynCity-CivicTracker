@@ -113,7 +113,7 @@ export default function ReportScreen({ route, navigation }: any) {
     if (!duplicate) return;
     try {
       await api.addReportComment(duplicate.id, 'Confirmed by another citizen.');
-    } catch {}
+    } catch { }
     setDuplicate(null);
     navigation.navigate('ReportDetail', { reportId: duplicate.id });
   };
@@ -200,7 +200,13 @@ export default function ReportScreen({ route, navigation }: any) {
             </View>
             <Text style={styles.successTitle}>Action Recorded!</Text>
             <Text style={styles.successSub}>Thank you for contributing to a better community. Our AI is verifying your report.</Text>
-            <TouchableOpacity style={styles.successBtn} onPress={() => navigation.navigate('Main')}>
+            <TouchableOpacity
+              style={styles.successBtn}
+              onPress={() => {
+                setShowSuccess(false);
+                navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+              }}
+            >
               <Text style={styles.successBtnText}>Return Home</Text>
             </TouchableOpacity>
           </View>
@@ -216,9 +222,9 @@ export default function ReportScreen({ route, navigation }: any) {
               <Text style={styles.dupTitle}>Nearby Report Found</Text>
             </View>
             <Text style={styles.dupSub}>A similar issue was reported {duplicate?.distance ? `${Math.round(duplicate.distance)}m` : 'nearby'} recently. Is this the same issue?</Text>
-            
+
             {duplicate?.image_url && <Image source={{ uri: duplicate.image_url }} style={styles.dupImg} />}
-            
+
             <TouchableOpacity style={styles.dupPrimaryBtn} onPress={confirmSameAsExisting}>
               <Text style={styles.dupPrimaryText}>It's the same — Confirm</Text>
             </TouchableOpacity>
@@ -250,9 +256,9 @@ const styles = StyleSheet.create({
   catGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   catChip: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 10, borderRadius: BorderRadius.lg, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   catChipText: { fontSize: FontSize.sm, fontWeight: FontWeight.bold, color: Colors.textMuted },
-  input: { 
-    backgroundColor: Colors.surface, padding: Spacing.md, borderRadius: BorderRadius.lg, 
-    color: Colors.text, fontSize: FontSize.md, minHeight: 80, textAlignVertical: 'top', 
+  input: {
+    backgroundColor: Colors.surface, padding: Spacing.md, borderRadius: BorderRadius.lg,
+    color: Colors.text, fontSize: FontSize.md, minHeight: 80, textAlignVertical: 'top',
     borderWidth: 1, borderColor: Colors.border,
     // @ts-ignore
     outlineStyle: 'none',

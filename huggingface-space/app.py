@@ -36,7 +36,7 @@ WEIGHTS_DIR = Path(os.environ.get("HOME", "/home/user")) / "weights"
 WEIGHTS_DIR.mkdir(parents=True, exist_ok=True)
 
 POTHOLE_THRESHOLD = float(os.environ.get("POTHOLE_THRESHOLD", "0.50"))
-GARBAGE_THRESHOLD = float(os.environ.get("GARBAGE_THRESHOLD", "0.75"))
+GARBAGE_THRESHOLD = float(os.environ.get("GARBAGE_THRESHOLD", "0.50"))
 
 # Lazy globals — loaded on first request to keep cold-start log clean.
 _pothole_model = None
