@@ -1,10 +1,10 @@
 export const Colors = {
-  // Brand - Deep Slate & Emerald
-  primary: '#0F172A',         // Slate 900 (Deep Civic Blue)
-  primaryDark: '#020617',
-  primarySoft: '#F1F5F9',
-  accent: '#10B981',          // Emerald 500 (Growth/Action)
-  accentSoft: '#ECFDF5',
+  // Brand - Navy & Orange
+  primary: '#1E3A8A',         // Navy Blue
+  primaryDark: '#172554',     // Dark Navy
+  primarySoft: '#DBEAFE',     // Soft Blue
+  accent: '#F97316',          // Orange
+  accentSoft: '#FFEDD5',      // Soft Orange
 
   // Semantic
   success: '#10B981',
@@ -17,14 +17,14 @@ export const Colors = {
   infoSoft: '#EFF6FF',
 
   // Neutrals
-  background: '#F8FAFC',      // Slate 50
-  surface: '#FFFFFF',
+  background: '#FFFFFF',      // White
+  surface: '#F8FAFC',         // Off-white/Light Slate
   surfaceMuted: '#F1F5F9',
-  text: '#0F172A',            // Slate 900
-  textSecondary: '#475569',   // Slate 600
-  textMuted: '#94A3B8',       // Slate 400
-  border: '#E2E8F0',          // Slate 200
-  borderStrong: '#CBD5E1',    // Slate 300
+  text: '#0F172A',            // Deep Navy Text
+  textSecondary: '#334155',   // Lighter Slate/Navy
+  textMuted: '#64748B',
+  border: '#E2E8F0',          // Slate Border
+  borderStrong: '#94A3B8',
   overlay: 'rgba(15, 23, 42, 0.6)',
 };
 
@@ -90,3 +90,4 @@ export const Shadow = {
     elevation: 10,
   },
 };
+

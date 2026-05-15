@@ -74,7 +74,7 @@ export default function ProfileScreen({ navigation, active = true }: any = {}) {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={Colors.accent} />}
       >
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Civic Profile</Text>
+          <Text style={styles.headerTitle}>SynCitizen Profile</Text>
           <TouchableOpacity style={styles.settingsBtn} onPress={() => supabase.auth.signOut()}>
             <HugeiconsIcon icon={Logout01Icon} color={Colors.danger} size={20} />
           </TouchableOpacity>
