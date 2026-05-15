@@ -132,7 +132,7 @@ export default function ReportScreen({ route, navigation }: any) {
           <Image source={{ uri: photoUri }} style={styles.image} />
           {location && (
             <View style={styles.locBadge}>
-              <HugeiconsIcon icon={MapPinIcon} color="white" size={12} />
+              <HugeiconsIcon icon={MapPinIcon} color={Colors.text} size={12} />
               <Text style={styles.locText}>
                 {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
               </Text>
