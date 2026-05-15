@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Platform, View } from 'react-native';
 import { NavigationContainer, DefaultTheme, NavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Session } from '@supabase/supabase-js';
@@ -77,6 +77,14 @@ export default function AppNavigator() {
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s);
+      // Synchronize with static About-Us page on web
+      if (Platform.OS === 'web') {
+        if (s) {
+          localStorage.setItem('synCity_token', s.access_token);
+        } else {
+          localStorage.removeItem('synCity_token');
+        }
+      }
       if (!s) {
         setOnboarded(null);
         lastUserId.current = null;

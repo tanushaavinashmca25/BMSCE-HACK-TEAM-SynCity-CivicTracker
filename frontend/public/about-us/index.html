@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SynCity | Lead Your Neighborhood to a Better Future</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Inter:wght@100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #fffcf9;
+            --color-surface: #ffffff;
+            --color-fg: #1c1917;
+            --color-accent: #f97316;
+            --color-brand: #ffedd5;
+            --color-border: #f5f5f4;
+            --font-display: 'Fraunces', serif;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-fg);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        .font-display { font-family: var(--font-display); }
+        .font-mono { font-family: var(--font-mono); }
+        /* Premium Highlights */
+        .marker-peach {
+            position: relative;
+            display: inline-block;
+            isolation: isolate;
+        }
+        .marker-peach::before {
+            content: "";
+            position: absolute;
+            inset: -0.05em -0.5em;
+            background: var(--color-brand);
+            z-index: -1;
+            border-radius: 35% 65% 60% 40% / 40% 35% 65% 60%;
+            transform-origin: left center;
+            transform: scaleX(0) rotate(-1.2deg);
+            transition: transform 1.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+            mix-blend-mode: multiply;
+            filter: blur(0.4px);
+            opacity: 0.9;
+        }
+        .marker-peach.active::before { transform: scaleX(1); }
+        .plaster-tape {
+            position: absolute;
+            background: #fef08a;
+            opacity: 0.6;
+            mix-blend-mode: multiply;
+            filter: blur(0.5px);
+            z-index: 40;
+            pointer-events: none;
+        }
+        .plaster-tr {
+            top: -18px;
+            right: -22px;
+            width: 140px;
+            height: 50px;
+            transform: rotate(35deg);
+            clip-path: polygon(5% 0%, 95% 2%, 100% 50%, 92% 98%, 8% 95%, 0% 45%);
+        }
+        .plaster-bl {
+            bottom: -18px;
+            left: -22px;
+            width: 120px;
+            height: 45px;
+            transform: rotate(40deg);
+            clip-path: polygon(2% 10%, 98% 5%, 95% 90%, 5% 95%, 0% 40%);
+        }
+        @media (max-width: 768px) {
+            .plaster-tr { width: 90px; height: 32px; right: -18px; }
+            .plaster-bl { width: 80px; height: 28px; left: -18px; }
+        }
+        .silk-grain::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.05;
+            background-image: radial-gradient(circle at 25% 30%, rgba(0,0,0,0.5) 0.5px, transparent 1px);
+            background-size: 4px 4px;
+            mix-blend-mode: multiply;
+        }
+        .card-soft {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 32px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        /* Map Styles */
+        #map-container {
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+            border: none;
+            pointer-events: none;
+        }
+        .map-bg {
+            background-color: #f8f6f4;
+            position: relative;
+            border-radius: 32px;
+            border: 1px solid var(--color-border);
+            overflow: hidden;
+        }
+        .map-marker { position: absolute; z-index: 20; }
+        /* Illustration Styles - Smaller & Cooler */
+        .illustration-box {
+            width: 100%;
+            max-width: 160px;
+            aspect-ratio: 1;
+            background: #fdfaf8;
+            border-radius: 28px;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #f1f1f1;
+            margin: 0 auto;
+        }
+        @media (min-width: 768px) {
+            .illustration-box {
+                max-width: 200px;
+            }
+        }
+        .scanning-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+            box-shadow: 0 0 12px var(--color-accent);
+            opacity: 0;
+            z-index: 30;
+        }
+        .viewfinder {
+            position: absolute;
+            inset: 20px;
+            border: 1px solid rgba(0,0,0,0.05);
+            pointer-events: none;
+        }
+        .viewfinder::before, .viewfinder::after {
+            content: "";
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-color: #f97316;
+            border-style: solid;
+            opacity: 0.4;
+        }
+        .viewfinder::before { top: -2px; left: -2px; border-width: 2px 0 0 2px; }
+        .viewfinder::after { bottom: -2px; right: -2px; border-width: 0 2px 2px 0; }
+        .bounding-box {
+            position: absolute;
+            border: 2px solid #f97316;
+            background: rgba(249, 115, 22, 0.1);
+            border-radius: 4px;
+            opacity: 0;
+            z-index: 25;
+        }
+        .success-burst {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #22c55e;
+            border-radius: 50%;
+            opacity: 0;
+        }
+        .word-mask { overflow: hidden; display: inline-block; vertical-align: top; padding: 0.1em 0; margin: -0.1em 0; }
+        .word-inner { display: inline-block; will-change: transform, opacity; padding: 0.05em 0; }
+    </style>
+</head>
+<body class="silk-grain min-h-screen">
+    <!-- Floating Navbar -->
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-5xl px-6 md:px-10 py-4 bg-white/70 backdrop-blur-xl border border-white/40 shadow-2xl shadow-orange-900/5 rounded-full flex justify-between items-center transition-all duration-500">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-orange-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-orange-600/20">S</div>
+            <span class="font-display text-xl md:text-2xl tracking-tighter text-stone-900">SynCity<span class="text-orange-600">.</span></span>
+        </div>
+        <div class="hidden md:flex items-center gap-8">
+            <a href="#how" class="text-[10px] font-mono font-bold uppercase tracking-widest text-stone-900 hover:text-orange-600 transition-colors">Workflow</a>
+            <a href="#leaderboard" class="text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400 hover:text-orange-600 transition-colors">Impact</a>
+            <a href="#municipal" class="text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400 hover:text-orange-600 transition-colors">Authority</a>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="/login" class="hidden sm:block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors">Login</a>
+            <a href="#" onclick="handleReportClick(event)" class="px-5 py-2 bg-orange-600 text-white rounded-full text-[10px] md:text-xs font-mono font-bold uppercase tracking-widest hover:bg-orange-700 transition-all shadow-lg shadow-orange-600/20">Report Now</a>
+        </div>
+    </nav>
+    <div class="relative z-20 bg-white">
+        <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center px-6 pt-28 md:pt-32 pb-20 overflow-hidden">
+        <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+            <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-orange-100 rounded-full mb-8">
+                    <div class="w-2 h-2 rounded-full bg-orange-600 animate-pulse"></div>
+                    <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-orange-700">Live in Bengaluru</span>
+                </div>
+                <h1 id="hero-headline" class="font-display text-4xl md:text-7xl lg:text-[5.5rem] tracking-tight leading-[1.1] text-stone-900 mb-8 md:mb-10">
+                    <span class="word-mask"><span class="word-inner">the</span></span> 
+                    <span class="word-mask"><span class="word-inner">power</span></span>
+                    <span class="word-mask"><span class="word-inner">to</span></span> <br>
+                    <span class="word-mask"><span class="word-inner text-orange-600 italic">fix</span></span> 
+                    <span class="word-mask"><span class="word-inner">your</span></span>
+                    <span class="word-mask"><span class="word-inner"><span class="marker-peach" id="hero-marker">city.</span></span></span>
+                </h1>
+                <p id="hero-sub" class="max-w-lg text-lg text-stone-600 leading-relaxed mb-10 opacity-0">
+                    Don't just walk past the problem. SynCity connects your neighborhood directly to municipal action. Reporting a civic issue is now as fast as taking a selfie.
+                </p>
+                <div id="hero-cta" class="flex flex-wrap gap-8 items-center opacity-0">
+                    <a href="#" onclick="handleReportClick(event)" class="px-8 py-4 bg-orange-600 text-white rounded-full font-bold text-lg hover:bg-orange-700 transition-all shadow-2xl shadow-orange-200 inline-flex items-center gap-3 group">
+                        Start Reporting
+                        <svg class="w-5 h-5 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15a2.25 2.25 0 002.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <div id="hero-visual" class="relative opacity-0 translate-x-12 lg:scale-105 lg:rotate-[-1deg]">
+                <div class="bg-white rounded-[40px] p-3 shadow-3xl border border-stone-100/50 relative">
+                    <!-- Plaster Tapes -->
+                    <div class="plaster-tape plaster-tr"></div>
+                    <div class="plaster-tape plaster-bl"></div>
+                    
+                    <div class="map-bg aspect-[5/4] w-full shadow-2xl relative overflow-hidden">
+                        <img src="map-bg.png" alt="Bengaluru Map" class="w-full h-full object-cover grayscale-[0.1] opacity-95 scale-110 origin-center">
+                        <!-- Subtle Map Overlay for Contrast -->
+                        <div class="absolute inset-0 bg-stone-900/5 pointer-events-none"></div>
+                        
+                        <!-- Markers -->
+                        <!-- Main Pothole Marker -->
+                        <div class="map-marker top-[22%] left-[38%] group cursor-pointer" style="z-index: 30;">
+                            <div class="relative">
+                                <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] font-mono py-1 px-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap shadow-xl -translate-y-2 group-hover:translate-y-0">Deep Pothole</div>
+                                <div class="absolute inset-0 bg-red-500/20 rounded-full animate-ping"></div>
+                                <div class="relative bg-red-500 w-12 h-12 rounded-full flex items-center justify-center text-white shadow-2xl ring-4 ring-white transition-transform group-hover:scale-110">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Main Garbage Marker -->
+                        <div class="map-marker top-[48%] right-[22%] group cursor-pointer" style="z-index: 30;">
+                            <div class="relative">
+                                <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] font-mono py-1 px-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap shadow-xl -translate-y-2 group-hover:translate-y-0">Overflowing Bin</div>
+                                <div class="absolute inset-0 bg-orange-500/20 rounded-full animate-ping" style="animation-delay: 0.5s;"></div>
+                                <div class="relative bg-orange-500 w-14 h-14 rounded-full flex items-center justify-center text-white shadow-2xl ring-4 ring-white transition-transform group-hover:scale-110">
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Small Pothole 1 -->
+                        <div class="map-marker top-[65%] left-[25%] group cursor-pointer" style="z-index: 30;">
+                            <div class="relative">
+                                <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] font-mono py-1 px-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap shadow-xl -translate-y-2 group-hover:translate-y-0">Minor Pothole</div>
+                                <div class="relative bg-red-500 w-8 h-8 rounded-full flex items-center justify-center text-white shadow-lg ring-2 ring-white transition-transform group-hover:scale-110">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Small Garbage 1 -->
+                        <div class="map-marker top-[35%] right-[40%] group cursor-pointer" style="z-index: 30;">
+                            <div class="relative">
+                                <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] font-mono py-1 px-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap shadow-xl -translate-y-2 group-hover:translate-y-0">Scattered Waste</div>
+                                <div class="relative bg-orange-500 w-8 h-8 rounded-full flex items-center justify-center text-white shadow-lg ring-2 ring-white transition-transform group-hover:scale-110">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Small Pothole 2 -->
+                        <div class="map-marker bottom-[20%] right-[35%] group cursor-pointer" style="z-index: 30;">
+                            <div class="relative">
+                                <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] font-mono py-1 px-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap shadow-xl -translate-y-2 group-hover:translate-y-0">Road Crack</div>
+                                <div class="relative bg-red-500 w-8 h-8 rounded-full flex items-center justify-center text-white shadow-lg ring-2 ring-white transition-transform group-hover:scale-110">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live City Stats -->
+    <section id="stats" class="py-12 md:py-16 px-6 border-y border-stone-100 bg-stone-50/50">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:flex md:flex-wrap justify-center gap-8 md:gap-24 scroll-reveal">
+            <div class="text-center">
+                <div class="text-3xl md:text-5xl font-display text-orange-600 mb-1 md:mb-2" id="stat-1">0</div>
+                <div class="text-[9px] md:text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">Issues Resolved</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl md:text-5xl font-display text-stone-900 mb-1 md:mb-2" id="stat-2">0</div>
+                <div class="text-[9px] md:text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">Active Guardians</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl md:text-5xl font-display text-stone-900 mb-1 md:mb-2" id="stat-3">0</div>
+                <div class="text-[9px] md:text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">Wards Covered</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl md:text-5xl font-display text-stone-900 mb-1 md:mb-2" id="stat-4">0</div>
+                <div class="text-[9px] md:text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">Reputation Points</div>
+            </div>
+        </div>
+    </section>
+    <!-- The Workflow (Animated Illustrations) -->
+    <section id="how" class="py-12 md:py-24 px-6 bg-white overflow-hidden scroll-mt-32">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12 md:mb-24">
+                <span class="eyebrow block mb-4 md:mb-6">The SynCity Loop</span>
+                <h2 class="font-display text-3xl md:text-6xl text-stone-900 leading-tight">Watch your report <br><span class="italic text-orange-600">come to life.</span></h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
+                <!-- Step 01: Snap -->
+                <div class="group scroll-reveal">
+                    <div class="illustration-box mb-4 md:mb-8" id="illu-1">
+                        <div class="viewfinder"></div>
+                        <svg id="svg-camera" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-stone-300 relative z-10">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                            <circle cx="12" cy="13" r="4" fill="transparent"/>
+                        </svg>
+                        <div id="camera-flash" class="absolute inset-0 bg-white opacity-0 z-40"></div>
+                        <!-- Mini Photo Preview -->
+                        <div id="photo-preview" class="absolute bottom-4 right-4 w-12 h-12 bg-orange-100 rounded-lg border border-white shadow-xl opacity-0 translate-y-4"></div>
+                    </div>
+                    <div class="flex gap-5">
+                        <span class="font-display text-5xl text-orange-100 font-bold">01</span>
+                        <div>
+                            <h3 class="font-display text-2xl mb-3">Snap.</h3>
+                            <p class="text-stone-500 text-sm leading-relaxed">
+                                Spot a problem? Just take a photo. Our engine captures the coordinates and context instantly.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Step 02: Verify -->
+                <div class="group scroll-reveal">
+                    <div class="illustration-box mb-4 md:mb-8" id="illu-2">
+                        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#1c1917 1px, transparent 1px); background-size: 20px 20px;"></div>
+                        <div class="bounding-box" id="ai-box-1" style="width: 60px; height: 40px; top: 30%; left: 20%;">
+                            <span class="absolute -top-5 left-0 text-[8px] font-mono font-bold text-orange-600 bg-white px-1">POTHOLE 98%</span>
+                        </div>
+                        <div class="bounding-box" id="ai-box-2" style="width: 40px; height: 30px; bottom: 30%; right: 20%;"></div>
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-stone-300 relative z-10">
+                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                        </svg>
+                        <div class="scanning-line" id="scan-line"></div>
+                    </div>
+                    <div class="flex gap-5">
+                        <span class="font-display text-5xl text-orange-100 font-bold">02</span>
+                        <div>
+                            <h3 class="font-display text-2xl mb-3">Verify.</h3>
+                            <p class="text-stone-500 text-sm leading-relaxed">
+                                AI confirms the issue in real-time. We deduplicate reports so the city stays focused on fixing.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Step 03: Fixed -->
+                <div class="group scroll-reveal">
+                    <div class="illustration-box mb-4 md:mb-8" id="illu-3">
+                        <svg id="svg-fixed" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-stone-200">
+                            <path id="path-check" d="M20 6L9 17L4 12" stroke-dasharray="30" stroke-dashoffset="30"/>
+                            <circle cx="12" cy="12" r="10" id="path-circle" stroke-dasharray="63" stroke-dashoffset="63"/>
+                        </svg>
+                        <div id="burst-container" class="absolute inset-0"></div>
+                    </div>
+                    <div class="flex gap-5">
+                        <span class="font-display text-5xl text-orange-100 font-bold">03</span>
+                        <div>
+                            <h3 class="font-display text-2xl mb-3">Fixed.</h3>
+                            <p class="text-stone-500 text-sm leading-relaxed">
+                                Verified reports are sent to the ward. Watch as your contribution turns from reported to fixed.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Before & After Showcase -->
+    <section id="showcase" class="py-24 md:py-32 px-6 bg-stone-50 overflow-hidden">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12 md:mb-20 scroll-reveal">
+                <span class="eyebrow block mb-6">Real World Impact</span>
+                <h2 class="font-display text-3xl md:text-6xl text-stone-900 leading-tight mb-6">From Reported to Restored.</h2>
+                <p class="text-base md:text-lg text-stone-600 max-w-2xl mx-auto leading-relaxed px-4">
+                    Our AI analyzes and marks issues according to urgency, ensuring that critical ward hazards are prioritized for immediate municipal action.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-12 scroll-reveal">
+                <!-- Reported State -->
+                <div class="group relative rounded-[30px] md:rounded-[40px] overflow-hidden shadow-2xl border-4 md:border-8 border-white bg-white">
+                    <div class="aspect-[4/3] w-full relative">
+                        <img src="pothole-before.png" alt="Reported Issue" class="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700">
+                        <div class="absolute inset-0 bg-stone-900/10 group-hover:bg-transparent transition-colors"></div>
+                    </div>
+                    <div class="absolute top-4 right-4 md:top-6 md:right-6">
+                        <div class="bg-red-500 text-white px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-mono font-bold uppercase tracking-widest shadow-lg animate-pulse">Urgency: Critical</div>
+                    </div>
+                    <div class="absolute bottom-6 left-6 md:bottom-8 md:left-8 bg-stone-900/80 backdrop-blur px-4 py-2 md:px-6 md:py-3 rounded-full text-white text-[8px] md:text-[10px] font-mono uppercase tracking-widest">
+                        Reported: May 12
+                    </div>
+                </div>
+
+                <!-- Restored State -->
+                <div class="group relative rounded-[30px] md:rounded-[40px] overflow-hidden shadow-2xl border-4 md:border-8 border-white bg-white">
+                    <div class="aspect-[4/3] w-full relative">
+                        <img src="pothole-after.png" alt="Restored Road" class="w-full h-full object-cover">
+                    </div>
+                    <div class="absolute top-4 right-4 md:top-6 md:right-6">
+                        <div class="bg-green-500 text-white px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-mono font-bold uppercase tracking-widest shadow-lg">Status: Restored</div>
+                    </div>
+                    <div class="absolute bottom-6 left-6 md:bottom-8 md:left-8 bg-orange-600/90 backdrop-blur px-4 py-2 md:px-6 md:py-3 rounded-full text-white text-[8px] md:text-[10px] font-mono uppercase tracking-widest">
+                        Verified Fix: May 15
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Leaderboard Section -->
+    <section id="leaderboard" class="py-32 px-6 bg-stone-50 border-y border-stone-100 scroll-mt-32">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+            <div class="scroll-reveal">
+                <span class="eyebrow block mb-6">Rise to the Top</span>
+                <h2 class="font-display text-4xl md:text-6xl text-stone-900 leading-tight mb-8">Stand tall in your <br><span class="marker-peach active">neighborhood.</span></h2>
+                <p class="text-lg text-stone-600 leading-relaxed mb-10">
+                    Every report is a step toward the #1 spot. Earn reputation, unlock badges, and become a ward legend.
+                </p>
+                <div class="text-4xl font-display text-orange-600 mb-1">+25 XP</div>
+                <div class="text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">Per Verified Fix</div>
+            </div>
+            <div class="relative scroll-reveal">
+                <div class="bg-white rounded-[40px] p-10 shadow-3xl border border-stone-100/50 relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-16">
+                        <div>
+                            <h3 class="font-display text-3xl mb-1">Koramangala Ward</h3>
+                            <p class="text-[10px] font-mono uppercase tracking-widest text-stone-400">Monthly Champions • May 2026</p>
+                        </div>
+                        <div class="bg-stone-50 px-4 py-2 rounded-full border border-stone-100">
+                            <span class="text-[10px] font-mono font-bold text-stone-600">4,200 Total Fixes</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-end justify-center gap-2 md:gap-4 mt-8 group">
+                        <!-- 2nd Place -->
+                        <div class="flex flex-col items-center">
+                            <div class="stand bg-stone-200 w-28 h-40 rounded-t-2xl relative flex flex-col items-center pt-8 group-hover:h-48 transition-all duration-1000">
+                                <span class="stand-num text-4xl opacity-20 font-display">2nd</span>
+                                <div class="absolute -top-12 flex flex-col items-center">
+                                    <div class="w-12 h-12 rounded-full bg-stone-100 border-2 border-white shadow-lg flex items-center justify-center font-bold text-sm text-stone-600">RP</div>
+                                    <span class="text-xs font-bold mt-2 text-stone-900">Rakshith P.</span>
+                                </div>
+                                <div class="mt-auto mb-4 text-center">
+                                    <div class="text-sm font-bold text-stone-500">Silver</div>
+                                    <div class="text-[10px] font-mono text-stone-400">🥈 Badge</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 1st Place -->
+                        <div class="flex flex-col items-center">
+                            <div class="stand bg-orange-600 w-32 h-56 rounded-t-3xl relative flex flex-col items-center pt-12 group-hover:h-64 transition-all duration-1000">
+                                <div class="absolute -top-16 text-4xl animate-bounce">👑</div>
+                                <span class="stand-num text-5xl text-orange-400/30 font-display">1st</span>
+                                <div class="absolute -top-16 flex flex-col items-center">
+                                    <div class="w-16 h-16 rounded-full bg-orange-100 border-4 border-white shadow-xl flex items-center justify-center font-bold text-xl text-orange-600">TA</div>
+                                    <span class="text-xs font-bold mt-2 text-stone-900">Tanusha A.</span>
+                                </div>
+                                <div class="mt-auto mb-6 text-center">
+                                    <div class="text-lg font-bold text-white">Legend</div>
+                                    <div class="text-[10px] font-mono text-orange-200">🥇 Gold Trophy</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 3rd Place -->
+                        <div class="flex flex-col items-center">
+                            <div class="stand bg-stone-300 w-28 h-28 rounded-t-2xl relative flex flex-col items-center pt-6 group-hover:h-36 transition-all duration-1000">
+                                <span class="stand-num text-3xl opacity-20 font-display">3rd</span>
+                                <div class="absolute -top-12 flex flex-col items-center">
+                                    <div class="w-12 h-12 rounded-full bg-stone-100 border-2 border-white shadow-lg flex items-center justify-center font-bold text-sm text-stone-600">RB</div>
+                                    <span class="text-xs font-bold mt-2 text-stone-900">Raksha B.</span>
+                                </div>
+                                <div class="mt-auto mb-4 text-center">
+                                    <div class="text-sm font-bold text-stone-500">Bronze</div>
+                                    <div class="text-[10px] font-mono text-stone-400">🥉 Badge</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Streaks Section -->
+    <section id="streaks" class="py-32 px-6 bg-white overflow-hidden border-b border-stone-100">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+            <div class="scroll-reveal">
+                <span class="eyebrow block mb-6">Momentum is Everything</span>
+                <h2 class="font-display text-4xl md:text-6xl text-stone-900 leading-tight mb-8">Daily Fix <br>Streaks.</h2>
+                <p class="text-lg text-stone-600 leading-relaxed mb-10">
+                    The legends of Bengaluru don't just report once. They maintain the fire. High streaks unlock exclusive ward perks and 2x XP multipliers.
+                </p>
+                <div class="flex items-center gap-6">
+                    <div>
+                        <div class="text-4xl font-display text-orange-600 mb-1">2.4x</div>
+                        <div class="text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">XP Multiplier</div>
+                    </div>
+                    <div class="w-px h-10 bg-stone-200"></div>
+                    <div>
+                        <div class="text-4xl font-display text-stone-900 mb-1">14d</div>
+                        <div class="text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">Avg. Streak</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="space-y-10">
+                <!-- Streak 01 -->
+                <div class="streak-row scroll-reveal">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center font-bold text-sm text-stone-600">TA</div>
+                            <div>
+                                <div class="font-bold text-stone-900">Tanusha A.</div>
+                                <div class="text-[10px] font-mono text-stone-400 uppercase tracking-tighter">Koramangala 3rd Block</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-orange-600 font-mono font-bold text-lg"><span id="streak-val-1">0</span>d</span>
+                            <span class="text-2xl">🔥</span>
+                        </div>
+                    </div>
+                    <div class="h-4 w-full bg-stone-50 rounded-full border border-stone-100 overflow-hidden shadow-inner">
+                        <div id="streak-bar-1" class="h-full bg-gradient-to-r from-orange-400 to-orange-600 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Streak 02 -->
+                <div class="streak-row scroll-reveal">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center font-bold text-sm text-stone-600">RP</div>
+                            <div>
+                                <div class="font-bold text-stone-900">Rakshith P.</div>
+                                <div class="text-[10px] font-mono text-stone-400 uppercase tracking-tighter">Indiranagar</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-orange-600 font-mono font-bold text-lg"><span id="streak-val-2">0</span>d</span>
+                            <span id="streak-icon-2" class="text-2xl">🔥</span>
+                        </div>
+                    </div>
+                    <div class="h-4 w-full bg-stone-50 rounded-full border border-stone-100 overflow-hidden shadow-inner">
+                        <div id="streak-bar-2" class="h-full bg-orange-400 rounded-full transition-colors duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Streak 03 -->
+                <div class="streak-row scroll-reveal">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center font-bold text-sm text-stone-600">RB</div>
+                            <div>
+                                <div class="font-bold text-stone-900">Raksha B.</div>
+                                <div class="text-[10px] font-mono text-stone-400 uppercase tracking-tighter">HSR Layout</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-orange-600 font-mono font-bold text-lg"><span id="streak-val-3">0</span>d</span>
+                            <span id="streak-icon-3" class="text-2xl">🔥</span>
+                        </div>
+                    </div>
+                    <div class="h-4 w-full bg-stone-50 rounded-full border border-stone-100 overflow-hidden shadow-inner">
+                        <div id="streak-bar-3" class="h-full bg-orange-400 rounded-full transition-colors duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Streak 04 -->
+                <div class="streak-row scroll-reveal">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-stone-50 border border-stone-100 flex items-center justify-center font-bold text-sm text-stone-600">TN</div>
+                            <div>
+                                <div class="font-bold text-stone-900">Tarun N.</div>
+                                <div class="text-[10px] font-mono text-stone-400 uppercase tracking-tighter">Whitefield</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-orange-600 font-mono font-bold text-lg"><span id="streak-val-4">0</span>d</span>
+                            <span id="streak-icon-4" class="text-2xl">🔥</span>
+                        </div>
+                    </div>
+                    <div class="h-4 w-full bg-stone-50 rounded-full border border-stone-100 overflow-hidden shadow-inner">
+                        <div id="streak-bar-4" class="h-full bg-orange-400 rounded-full transition-colors duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Municipal Partnership Section -->
+    <section id="municipal" class="py-24 md:py-32 px-6 bg-stone-900 text-white overflow-hidden relative scroll-mt-32">
+        <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 30px 30px;"></div>
+        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center relative z-10">
+            <div class="scroll-reveal">
+                <span class="text-orange-500 font-mono font-bold uppercase tracking-widest mb-6 block">Direct Authority Link</span>
+                <h2 class="font-display text-3xl md:text-6xl leading-tight mb-8">Not just a queue. <br>A commitment.</h2>
+                <p class="text-base md:text-lg text-stone-400 leading-relaxed mb-10 px-0">
+                    We've integrated directly with ward-level dashboards. Your reports are legally verified by AI and sent straight to the relevant municipal engineer. No middleman, no delays.
+                </p>
+                <div class="grid grid-cols-2 gap-y-6 gap-x-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-orange-600/20 flex items-center justify-center text-orange-500">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        </div>
+                        <span class="font-bold text-sm">ML Detection</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-orange-600/20 flex items-center justify-center text-orange-500">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        </div>
+                        <span class="font-bold text-sm">AI Analysis</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-orange-600/20 flex items-center justify-center text-orange-500">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        </div>
+                        <span class="font-bold text-sm">Urgency Scoring</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-orange-600/20 flex items-center justify-center text-orange-500">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        </div>
+                        <span class="font-bold text-sm">Pinpoint GPS</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-orange-600/20 flex items-center justify-center text-orange-500">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        </div>
+                        <span class="font-bold text-sm">No Duplicates</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-orange-600/20 flex items-center justify-center text-orange-500">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        </div>
+                        <span class="font-bold text-sm">Live Updates</span>
+                    </div>
+                </div>
+            </div>
+            <div class="relative scroll-reveal">
+                <div class="bg-stone-800 rounded-[40px] p-12 border border-stone-700 shadow-2xl relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-gradient-to-br from-orange-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="text-[10px] font-mono uppercase tracking-[0.2em] text-stone-500 mb-8">Official Partnership</div>
+                    <div class="space-y-8">
+                        <div class="flex items-center gap-6">
+                            <div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                                <span class="font-display text-2xl">BB</span>
+                            </div>
+                            <div>
+                                <div class="text-xl font-display">BBMP Bengaluru</div>
+                                <div class="text-sm text-stone-500">Certified Partner Node</div>
+                            </div>
+                        </div>
+                        <div class="h-px bg-stone-700"></div>
+                        <p class="italic text-stone-400">"SynCity provides us with the high-fidelity data we need to prioritize ward maintenance effectively."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    </div>
+
+    <!-- Final CTA Section (Integrated Footer) -->
+    <section id="final-cta" class="sticky bottom-0 z-10 py-24 md:py-32 pb-12 md:pb-16 px-6 bg-orange-600 text-white text-center overflow-hidden">
+        <!-- Subtle Background Decorative Element -->
+        <div class="absolute -bottom-24 -right-24 w-64 md:w-96 h-64 md:h-96 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -top-24 -left-24 w-48 md:w-64 h-48 md:h-64 bg-black/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-4xl mx-auto scroll-reveal relative z-10">
+            <h2 class="font-display text-4xl md:text-7xl mb-10 leading-tight">Ready to be the hero <br>your ward needs?</h2>
+            <div class="flex justify-center mb-24 md:mb-32">
+                <a href="#" onclick="handleReportClick(event)" class="px-8 py-4 md:px-12 md:py-6 bg-white text-orange-600 rounded-full font-bold text-lg md:text-xl hover:bg-stone-50 transition-all shadow-2xl shadow-orange-900/20 group inline-flex items-center gap-3">
+                    Start reporting now
+                    <svg class="w-5 h-5 md:w-6 md:h-6 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15a2.25 2.25 0 002.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+                    </svg>
+                </a>
+            </div>
+
+            <!-- Integrated Footer -->
+            <div class="pt-8 mt-12 border-t border-white/20 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="font-display text-xl tracking-tighter">SynCity<span class="text-white/60">.</span></div>
+                <div class="font-mono text-[9px] text-white/50 uppercase tracking-widest">&copy; 2026 Community Project</div>
+            </div>
+        </div>
+    </section>
+    <script>
+        // Auth-aware routing logic
+        function handleReportClick(e) {
+            e.preventDefault();
+            // Check for authentication token in localStorage (common pattern)
+            const isLoggedIn = localStorage.getItem('synCity_token'); 
+            
+            if (isLoggedIn) {
+                // Take authenticated users to the report page
+                window.location.href = '/report';
+            } else {
+                // Take unauthenticated users to the login page first
+                window.location.href = '/login';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hero
+            const tl = anime.timeline({ easing: 'easeOutQuart' });
+            tl.add({ targets: '.word-inner', translateY: ['110%', '0%'], rotate: [-4, 0], opacity: [0, 1], duration: 800, delay: anime.stagger(120, {start: 300}) })
+              .add({ targets: '#hero-sub, #hero-cta', translateY: [20, 0], opacity: [0, 1], duration: 700 }, '-=500')
+              .add({ targets: '#hero-visual', translateX: [40, 0], rotate: -1, opacity: [0, 1], duration: 1000, complete: () => document.getElementById('hero-marker').classList.add('active') }, '-=1000');
+            // Step 1: Snap
+            function animateStep1() {
+                anime.timeline({ easing: 'easeOutSine', loop: true })
+                .add({ targets: '#svg-camera', scale: [1, 0.9, 1.05, 1], duration: 400, delay: 1000 })
+                .add({ targets: '#camera-flash', opacity: [0, 0.9, 0], duration: 200 }, '-=400')
+                .add({ targets: '#photo-preview', opacity: [0, 1, 0], translateY: [20, 0, -10], duration: 1500 }, '-=100');
+            }
+            // Step 2: Verify
+            function animateStep2() {
+                document.getElementById('scan-line').style.opacity = '1';
+                anime.timeline({ loop: true, easing: 'linear' })
+                .add({ targets: '#scan-line', top: ['0%', '100%'], duration: 2500 })
+                .add({ targets: '#ai-box-1', opacity: [0, 1, 0], duration: 500 }, '-=2000')
+                .add({ targets: '#ai-box-2', opacity: [0, 1, 0], duration: 500 }, '-=1000');
+            }
+            // Step 3: Fixed
+            function animateStep3() {
+                const burstContainer = document.getElementById('burst-container');
+                for(let i=0; i<8; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'success-burst';
+                    dot.style.left = '50%'; dot.style.top = '50%';
+                    burstContainer.appendChild(dot);
+                }
+                anime.timeline({ loop: true, delay: 1000 })
+                .add({ targets: '#svg-fixed', opacity: [0, 1], duration: 400 })
+                .add({ targets: '#path-circle', strokeDashoffset: [63, 0], duration: 800, easing: 'easeOutQuart' }, '-=400')
+                .add({ targets: '#path-check', strokeDashoffset: [30, 0], duration: 600, easing: 'easeOutBack', begin: () => document.getElementById('svg-fixed').classList.add('text-green-500') }, '-=200')
+                .add({
+                    targets: '.success-burst',
+                    opacity: [0, 1, 0],
+                    translateX: () => anime.random(-60, 60),
+                    translateY: () => anime.random(-60, 60),
+                    scale: [0, 1.5, 0],
+                    duration: 1000,
+                    easing: 'easeOutExpo'
+                }, '-=400')
+                .add({ targets: '#svg-fixed', opacity: [1, 0], duration: 500, delay: 2000, complete: () => document.getElementById('svg-fixed').classList.remove('text-green-500') });
+            }
+
+            function animateStreaks() {
+                const duration = 8000;
+                const tl = anime.timeline({ loop: true, delay: 500 });
+                
+                // User 1: Legend (Uninterrupted)
+                tl.add({ targets: '#streak-bar-1', width: ['0%', '100%'], duration: duration, easing: 'linear' }, 0)
+                  .add({ targets: '#streak-val-1', innerHTML: [0, 30], round: 1, duration: duration, easing: 'linear' }, 0);
+
+                // User 2: Early Break
+                tl.add({ targets: '#streak-bar-2', width: ['0%', '20%'], duration: 1300, easing: 'linear' }, 0)
+                  .add({ targets: '#streak-val-2', innerHTML: [0, 5], round: 1, duration: 1300, easing: 'linear' }, 0)
+                  .add({ targets: '#streak-bar-2', width: '0%', duration: 400, easing: 'easeInBack', begin: () => {
+                      document.getElementById('streak-icon-2').innerText = '💨';
+                      document.getElementById('streak-bar-2').classList.replace('bg-orange-400', 'bg-stone-300');
+                  }}, 1300)
+                  .add({ targets: '#streak-bar-2', width: ['0%', '75%'], duration: duration - 1700, easing: 'linear', begin: () => {
+                      document.getElementById('streak-icon-2').innerText = '🔥';
+                      document.getElementById('streak-bar-2').classList.replace('bg-stone-300', 'bg-orange-400');
+                  }}, 1700)
+                  .add({ targets: '#streak-val-2', innerHTML: [0, 25], round: 1, duration: duration - 1700, easing: 'linear' }, 1700);
+
+                // User 3: Mid-Late Break
+                tl.add({ targets: '#streak-bar-3', width: ['0%', '70%'], duration: 5800, easing: 'linear' }, 0)
+                  .add({ targets: '#streak-val-3', innerHTML: [0, 22], round: 1, duration: 5800, easing: 'linear' }, 0)
+                  .add({ targets: '#streak-bar-3', width: '0%', duration: 400, easing: 'easeInBack', begin: () => {
+                      document.getElementById('streak-icon-3').innerText = '💨';
+                      document.getElementById('streak-bar-3').classList.replace('bg-orange-400', 'bg-stone-300');
+                  }}, 5800)
+                  .add({ targets: '#streak-bar-3', width: ['0%', '15%'], duration: duration - 6200, easing: 'linear', begin: () => {
+                      document.getElementById('streak-icon-3').innerText = '🔥';
+                      document.getElementById('streak-bar-3').classList.replace('bg-stone-300', 'bg-orange-400');
+                  }}, 6200)
+                  .add({ targets: '#streak-val-3', innerHTML: [0, 8], round: 1, duration: duration - 6200, easing: 'linear' }, 6200);
+
+                // User 4: Mid Break
+                tl.add({ targets: '#streak-bar-4', width: ['0%', '50%'], duration: 4000, easing: 'linear' }, 0)
+                  .add({ targets: '#streak-val-4', innerHTML: [0, 15], round: 1, duration: 4000, easing: 'linear' }, 0)
+                  .add({ targets: '#streak-bar-4', width: '0%', duration: 400, easing: 'easeInBack', begin: () => {
+                      document.getElementById('streak-icon-4').innerText = '💨';
+                      document.getElementById('streak-bar-4').classList.replace('bg-orange-400', 'bg-stone-300');
+                  }}, 4000)
+                  .add({ targets: '#streak-bar-4', width: ['0%', '40%'], duration: duration - 4400, easing: 'linear', begin: () => {
+                      document.getElementById('streak-icon-4').innerText = '🔥';
+                      document.getElementById('streak-bar-4').classList.replace('bg-stone-300', 'bg-orange-400');
+                  }}, 4400)
+                  .add({ targets: '#streak-val-4', innerHTML: [0, 15], round: 1, duration: duration - 4400, easing: 'linear' }, 4400);
+                
+                tl.add({ targets: '.streak-row', opacity: [1, 1], duration: 2000 });
+            }
+
+            function animateStats() {
+                anime({ targets: '#stat-1', innerHTML: [0, 84], round: 1, duration: 2000, easing: 'easeOutExpo' });
+                anime({ targets: '#stat-2', innerHTML: [0, 42], round: 1, duration: 2000, delay: 200, easing: 'easeOutExpo' });
+                anime({ targets: '#stat-3', innerHTML: [0, 12], round: 1, duration: 1500, delay: 400, easing: 'easeOutExpo' });
+                anime({ targets: '#stat-4', innerHTML: [0, 96], round: 1, duration: 2500, delay: 600, easing: 'easeOutExpo' });
+            }
+
+            // Before & After Slider Logic
+            const slider = document.getElementById('comparison-slider');
+            const overlay = document.getElementById('comparison-overlay');
+            if (slider && overlay) {
+                let isDragging = false;
+                const move = (e) => {
+                    if (!isDragging) return;
+                    const container = slider.parentElement;
+                    const rect = container.getBoundingClientRect();
+                    const x = (e.pageX || e.touches[0].pageX) - rect.left;
+                    const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
+                    slider.style.left = `${percent}%`;
+                    overlay.style.width = `${percent}%`;
+                };
+                slider.addEventListener('mousedown', () => isDragging = true);
+                window.addEventListener('mouseup', () => isDragging = false);
+                window.addEventListener('mousemove', move);
+                slider.addEventListener('touchstart', () => isDragging = true);
+                window.addEventListener('touchend', () => isDragging = false);
+                window.addEventListener('touchmove', move);
+            }
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const target = entry.target;
+                        if (target.id === 'illu-1') animateStep1();
+                        if (target.id === 'illu-2') animateStep2();
+                        if (target.id === 'illu-3') animateStep3();
+                        if (target.id === 'streaks') animateStreaks();
+                        if (target.id === 'stats') animateStats();
+                        
+                        // If it's an illustration, animate the parent (the whole step)
+                        // If it's a scroll-reveal div, animate itself
+                        const animeTarget = target.classList.contains('illustration-box') ? target.parentElement : target;
+                        
+                        anime({ targets: animeTarget, translateY: [40, 0], opacity: [0, 1], duration: 1000, easing: 'easeOutQuart' });
+                        observer.unobserve(target);
+                    }
+                });
+            }, { threshold: 0.2 });
+            document.querySelectorAll('.illustration-box, #streaks, #stats').forEach(el => observer.observe(el));
+            document.querySelectorAll('.scroll-reveal:not(.illustration-box)').forEach(el => { el.style.opacity = '0'; observer.observe(el); });
+        });
+    </script>
+</body>
+</html>
