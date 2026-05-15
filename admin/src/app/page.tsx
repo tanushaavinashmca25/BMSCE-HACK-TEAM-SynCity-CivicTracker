@@ -20,6 +20,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ReportsTable } from "@/components/reports-table";
+import { ReportsMap } from "@/components/reports-map";
 import { adminApi } from "@/lib/api";
 import { STATUS_COLORS, STATUS_FALLBACK } from "@/lib/format";
 
@@ -30,7 +31,7 @@ async function loadData() {
   try {
     const [kpis, reports, config] = await Promise.all([
       adminApi.kpis(),
-      adminApi.reports({ limit: 10 }),
+      adminApi.reports({ limit: 200 }),
       adminApi.config().catch(() => null),
     ]);
     return { kpis, reports, config, error: null as string | null };
@@ -42,6 +43,7 @@ async function loadData() {
 
 export default async function AdminDashboard() {
   const { kpis, reports, config, error } = await loadData();
+  const recentReports = reports.slice(0, 10);
 
   const appName = config?.app_name || "Civic Tracker";
 
@@ -136,6 +138,45 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
+      <Card>
+        <CardHeader className="border-b">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <MapPin className="h-4 w-4 text-rose-500" />
+                Reports map
+              </CardTitle>
+              <CardDescription>
+                {reports.length} report{reports.length === 1 ? "" : "s"} plotted ·
+                click a marker to open.
+              </CardDescription>
+            </div>
+            <div className="flex flex-wrap gap-2 text-xs">
+              {[
+                { label: "Reported", color: "#6366f1" },
+                { label: "Pending", color: "#f59e0b" },
+                { label: "In progress", color: "#0ea5e9" },
+                { label: "Resolved", color: "#10b981" },
+              ].map((l) => (
+                <span
+                  key={l.label}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2 py-0.5 font-medium text-muted-foreground"
+                >
+                  <span
+                    className="inline-block h-2 w-2 rounded-full"
+                    style={{ backgroundColor: l.color }}
+                  />
+                  {l.label}
+                </span>
+              ))}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-4">
+          <ReportsMap reports={reports} height={460} />
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader className="border-b">
@@ -161,7 +202,7 @@ export default async function AdminDashboard() {
             </div>
           </CardHeader>
           <CardContent className="p-0">
-            <ReportsTable reports={reports} />
+            <ReportsTable reports={recentReports} />
           </CardContent>
         </Card>
 

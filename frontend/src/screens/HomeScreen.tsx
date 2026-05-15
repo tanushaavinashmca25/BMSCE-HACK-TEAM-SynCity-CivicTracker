@@ -123,7 +123,7 @@ export default function HomeScreen({ navigation, active = true }: any) {
 
         <View style={styles.section}>
           <Text style={styles.sectionHeader}>Impact Areas</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.catScroll}>
+          <View style={styles.catGrid}>
             {config?.categories?.map((c) => (
               <TouchableOpacity key={c.code} style={styles.catCard}>
                 <View style={[styles.catIconWrap, { backgroundColor: `${c.color}10` }]}>
@@ -132,7 +132,7 @@ export default function HomeScreen({ navigation, active = true }: any) {
                 <Text style={styles.catLabel}>{c.label}</Text>
               </TouchableOpacity>
             ))}
-          </ScrollView>
+          </View>
         </View>
 
         <View style={styles.section}>
@@ -207,10 +207,10 @@ const styles = StyleSheet.create({
   reportBtnText: { color: 'white', fontWeight: FontWeight.bold, fontSize: FontSize.sm },
   section: { gap: Spacing.md },
   sectionHeader: { fontSize: FontSize.sm, fontWeight: FontWeight.heavy, color: Colors.text, textTransform: 'uppercase', letterSpacing: 1 },
-  catScroll: { gap: Spacing.sm, paddingRight: Spacing.lg },
+  catGrid: { flexDirection: 'row', gap: Spacing.md },
   catCard: { 
-    alignItems: 'center', gap: 8, backgroundColor: Colors.surface, 
-    padding: Spacing.md, borderRadius: BorderRadius.xl, width: 100,
+    flex: 1, alignItems: 'center', gap: 8, backgroundColor: Colors.surface, 
+    padding: Spacing.md, borderRadius: BorderRadius.xl,
     borderWidth: 1, borderColor: Colors.border,
   },
   catIconWrap: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },

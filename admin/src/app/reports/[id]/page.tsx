@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Separator } from "@/components/ui/separator";
+import { ReportMap } from "@/components/report-map";
 import { adminApi, STATUSES } from "@/lib/api";
 import { STATUS_COLORS, STATUS_FALLBACK, timeAgo } from "@/lib/format";
 import { postUpdate } from "./actions";
@@ -123,6 +124,20 @@ export default async function ReportDetailPage({
                   </span>
                 </div>
               </div>
+
+              {typeof report.location?.latitude === "number" &&
+              typeof report.location?.longitude === "number" ? (
+                <div className="space-y-1.5">
+                  <Label>Location</Label>
+                  <ReportMap
+                    id={report.id}
+                    latitude={report.location.latitude}
+                    longitude={report.location.longitude}
+                    status={report.status}
+                    height={260}
+                  />
+                </div>
+              ) : null}
 
               {report.description ? (
                 <div className="space-y-1">

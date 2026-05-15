@@ -62,6 +62,10 @@ class GeminiService:
         1. Provide a professional, detailed description of the issue.
         2. Suggest an urgency score from 1 (low) to 5 (critical) based on public safety impact.
         3. Identify any specific details (e.g., depth of pothole, type of garbage, safety hazards).
+        4. VERIFY: Does this image actually show the reported category ({category})? 
+           Set ai_verification_status to "Verified" if it clearly shows {category}.
+           Set it to "Inauthentic" if it definitely does NOT show {category} or is a fake/unrelated image.
+           Set it to "Ambiguous" if you are unsure.
 
         Return the result in JSON format:
         {{

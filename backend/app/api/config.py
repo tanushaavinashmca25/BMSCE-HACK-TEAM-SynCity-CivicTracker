@@ -22,20 +22,6 @@ async def get_app_config():
             color="#10B981",
             description="Uncollected waste or illegal dumping.",
         ),
-        CategoryInfo(
-            code="Utility Fault",
-            label="Utility Fault",
-            icon="bolt",
-            color="#F59E0B",
-            description="Broken streetlights, leaks, exposed wiring.",
-        ),
-        CategoryInfo(
-            code="Other",
-            label="Other",
-            icon="alert",
-            color="#6366F1",
-            description="Anything else affecting your neighborhood.",
-        ),
     ]
     return AppConfig(
         app_name="Civic Tracker",
